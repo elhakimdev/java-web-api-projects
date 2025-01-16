@@ -1,8 +1,7 @@
 package com.sass.erp.finance.cash.api_service.models.repositories;
 
-import com.sass.erp.finance.cash.api_service.models.entities.UserEntity;
+import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 
-import java.util.List;
-
-public interface UserRepository {
+public interface UserRepository extends BaseRepository<UserEntity, String> {
 }
+
