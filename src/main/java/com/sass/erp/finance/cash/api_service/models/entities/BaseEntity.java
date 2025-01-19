@@ -1,14 +1,14 @@
 package com.sass.erp.finance.cash.api_service.models.entities;
 
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedAuditLog;
+import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedExternalID;
+import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedTimeStamp;
-import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedUUID;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,7 +18,10 @@ public abstract class BaseEntity {
     public static final String DEFAULT_AUDITOR_FLAG = "System";
 
     @EmbeddedId
-    private EmbeddedUUID id;
+    private EmbeddedIdentifier identifier;
+
+    @Embedded
+    private EmbeddedExternalID externalIdentifier;
 
     @Embedded
     private EmbeddedTimeStamp timeStamp;

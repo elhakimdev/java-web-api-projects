@@ -2,8 +2,6 @@ package com.sass.erp.finance.cash.api_service.models.entities.authorizations;
 
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.relationship.UserHasRolesEntity;
-import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedUUID;
-import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedTimeStamp;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

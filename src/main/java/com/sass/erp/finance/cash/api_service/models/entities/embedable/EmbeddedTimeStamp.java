@@ -9,28 +9,20 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Getter
 @Setter
+@Getter
 @ToString
 @Embeddable
 public class EmbeddedTimeStamp {
-    @Getter
-    @Setter
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Getter
-    @Setter
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    @Getter
-    @Setter
     @Column(name = "deleted_at", nullable = true)
     private LocalDateTime deletedAt;
 
-    @Getter
-    @Setter
     @Column(name = "restored_at", nullable = true)
     private LocalDateTime restoredAt;
 }

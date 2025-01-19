@@ -49,10 +49,6 @@ public class UserController {
         List<UserEntity> users = this.userService.getCrudTaskService().read();
         logger.info("users: {} {}", users.toArray(), "data");
 
-        if(users.toArray().length == 0) {
-            this.userService.createDefaultUser();
-        }
-
         List<HashMap<String, Object>> userList = users.stream().map(user -> {
             UserResource userResource = new UserResource(user);
             logger.info("log here: {}", userResource);
@@ -62,23 +58,23 @@ public class UserController {
         return ResponseEntity.ok(success(userList, "List of all users data test", Optional.of(HttpStatus.OK)));
     }
 
-    @GetMapping("/users/{id}")
-    public ResponseEntity<RestfullApiResponse<HashMap<String, Object>>> show(){
-        UserEntity defaultUser = this.userService.createDefaultUser();
-
-        UserResource userResource = new UserResource(defaultUser);
-        return ResponseEntity.ok(success(userResource.toResponse(), "List of all users", Optional.of(HttpStatus.OK)));
-    }
-
     @GetMapping("/users/create")
     public void create(){
         this.createDummyUser();
+        this.createVerifiedUser();
     }
 
     protected void createDummyUser(){
         UserFactory userFactory = new UserFactory();
         userFactory.setRepository(userRepository);
         userFactory.setEntityManager(entityManager);
-        userFactory.count(100).create();
+        userFactory.count(10).create();
+    }
+
+    protected void createVerifiedUser() {
+        UserFactory userFactory = new UserFactory();
+        userFactory.setRepository(userRepository);
+        userFactory.setEntityManager(entityManager);
+        userFactory.verifiedUser().count(10).create();
     }
 }

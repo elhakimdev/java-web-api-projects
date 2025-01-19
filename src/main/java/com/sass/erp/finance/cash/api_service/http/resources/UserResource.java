@@ -13,7 +13,10 @@ public class UserResource {
 
     public HashMap<String, Object> toResponse(){
         HashMap<String, Object> responseMap = new HashMap<>();
-        responseMap.put("id", this.user.getId().getUuid());
+        responseMap.put("id", this.user.getIdentifier().getUuid());
+        responseMap.put("externalId", this.user.getExternalIdentifier().getExternalId());
+        responseMap.put("systemRefId", this.user.getExternalIdentifier().getSystemRefId());
+        responseMap.put("displayId", this.user.getExternalIdentifier().getDisplayId());
         responseMap.put("username", this.user.getUserUsername());
         responseMap.put("email", this.user.getUserEmail());
         responseMap.put("isActive", this.user.getUserIsActive());

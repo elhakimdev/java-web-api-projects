@@ -47,6 +47,7 @@ public abstract class BaseFactory<T extends BaseEntity> {
         logger.info("Called create");
         for (int i = 0; i < count; i++) {
             T entity = prePersist(make());
+            states.forEach(state -> state.accept(entity));
             logger.info("Creating entity: {} with value: {}", entity.getClass(), entity);
             getRepository().saveAndFlush(entity);
             logger.info("Saving entity: {} with value: {}", entity.getClass(), entity);
