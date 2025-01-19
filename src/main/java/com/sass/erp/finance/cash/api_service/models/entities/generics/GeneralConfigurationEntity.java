@@ -16,6 +16,7 @@ import java.sql.Time;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_GENERIC_GENERAL_CONFIGURATIONS")
 public class GeneralConfigurationEntity extends BaseEntity {
     @Column(name = "general_config_version")

@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_GROUP")
 public class UserGroupEntity extends BaseEntity {
   @Column(name = "user_group_name")

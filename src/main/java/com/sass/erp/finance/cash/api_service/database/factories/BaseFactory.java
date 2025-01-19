@@ -1,61 +1,87 @@
 package com.sass.erp.finance.cash.api_service.database.factories;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.github.javafaker.Faker;
+import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedAuditLog;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedTimeStamp;
-import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedUUID;
-import lombok.Getter;
-import lombok.Setter;
+import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;
+import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public abstract class BaseFactory<T> {
+public abstract class BaseFactory<T extends BaseEntity> {
 
     protected Logger logger = LoggerFactory.getLogger(BaseFactory.class);
 
-    protected final Faker faker = new Faker();
+    protected EntityManager entityManager;
 
-    @Getter
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final int DEFAULT_COUNT = 1;
 
-    @Getter
-    @Setter
-    public T entity;
+    protected int count = 0;
 
-    @Getter
-    protected EmbeddedUUID id = new EmbeddedUUID();
+    protected List<Consumer<T>> states = new ArrayList<>();
 
-    @Getter
-    protected EmbeddedTimeStamp timeStamp = new EmbeddedTimeStamp();
-
-    @Getter
-    protected EmbeddedAuditLog auditLog = new EmbeddedAuditLog();
-
-    public abstract void definition() throws JsonProcessingException;
-
-    public BaseFactory(){
-        this.objectMapper.registerModule(new JavaTimeModule());
+    public T make(){
+        return definition();
     }
 
-    public void create(Integer count) throws JsonProcessingException {
-        try {
-            for (int i = 0; i < count; i++) {
-                this.definition();
-            }
-        } catch (Exception exception) {
-            logger.error(exception.getMessage());
+    public void create(){
+        if (this.count == 0) {
+            this.create(DEFAULT_COUNT);
+        } else {
+            this.create(this.count);
         }
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public void create(int count){
+        logger.info("Called create");
+        for (int i = 0; i < count; i++) {
+            T entity = prePersist(make());
+            logger.info("Creating entity: {} with value: {}", entity.getClass(), entity);
+            getRepository().saveAndFlush(entity);
+            logger.info("Saving entity: {} with value: {}", entity.getClass(), entity);
+        }
+
+        getRepository().flush();
+        this.getEntityManager().clear();
+        this.count = DEFAULT_COUNT;
     }
+
+    public BaseFactory<T> count(int count) {
+        this.count = count;
+        return this;
+    }
+
+    public BaseFactory<T> state(Consumer<T> state) {
+        states.add(state);
+        return this;
+    }
+
+    protected T prePersist(T entity) {
+        EmbeddedAuditLog auditLog = new EmbeddedAuditLog();
+        EmbeddedTimeStamp timeStamp = new EmbeddedTimeStamp();
+
+        timeStamp.setCreatedAt(LocalDateTime.now());
+        timeStamp.setUpdatedAt(LocalDateTime.now());
+        timeStamp.setRestoredAt(null);
+        timeStamp.setDeletedAt(null);
+
+        auditLog.setCreatedBy("SYSTEM_SEEDER");
+        auditLog.setLastUpdatedBy("SYSTEM_SEEDER");
+        auditLog.setLastRestoredBy(null);
+        auditLog.setLastDeletedBy(null);
+
+        entity.setAuditLog(auditLog);
+        entity.setTimeStamp(timeStamp);
+        return entity;
+    }
+
+    protected abstract T definition();
+    protected abstract BaseRepository<T, ?> getRepository();
+    protected abstract EntityManager getEntityManager();
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sass.erp.finance.cash.api_service.database.factories.UserFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import com.sass.erp.finance.cash.api_service.models.repositories.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +14,19 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class UserSeeder {
+public class UserSeeder extends BaseSeeder {
 
-    protected Logger logger = LoggerFactory.getLogger(UserSeeder.class);
-
-    @Autowired
-    protected UserFactory factory;
 
     @Autowired
-    protected UserRepository repository;
+    protected UserRepository userRepository;
 
-    public void run(String ...args) throws JsonProcessingException {
-        logger.info(
-                "Running [{}] to create [{}] records of [{}]",
-                this.factory.getClass().getCanonicalName(),
-                10,
-                this.factory.getEntity().getClass().getCanonicalName());
-        this.factory.create(10);
+    @Autowired
+    protected EntityManager entityManager;
+
+    @Override
+    @Transactional
+    public void run() {
+        UserFactory userFactory = UserFactory.newInstance(this.userRepository, this.entityManager);
+        userFactory.count(100).create();
     }
 }

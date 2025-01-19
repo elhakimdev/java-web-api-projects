@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_MASTERS_SCOPE_CATEGORY")
 public class ScopeEntity extends BaseEntity {
     @Column(name = "scope_name")

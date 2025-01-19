@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_AUTHORIZATION_SCOPES")
 public class AuthorizationScopeEntity extends BaseEntity {
     @Column(name = "authorization_scope_name")

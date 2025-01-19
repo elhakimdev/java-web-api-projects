@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_PERMISSIONS")
 public class PermissionEntity extends BaseEntity {
   @Column(name="permission_name", nullable = false)

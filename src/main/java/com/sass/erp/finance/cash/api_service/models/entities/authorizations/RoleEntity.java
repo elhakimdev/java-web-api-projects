@@ -17,6 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_ROLES")
 public class RoleEntity extends BaseEntity {
   @Column(name = "role_name", nullable = false)

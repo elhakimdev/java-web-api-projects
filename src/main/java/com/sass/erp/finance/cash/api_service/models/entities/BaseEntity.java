@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -20,40 +21,40 @@ public abstract class BaseEntity {
     private EmbeddedUUID id;
 
     @Embedded
-    private EmbeddedTimeStamp timestamp;
+    private EmbeddedTimeStamp timeStamp;
 
     @Embedded
     private EmbeddedAuditLog auditLog;
 
     @PostPersist
     public void postPersist(){
-        if(this.getTimestamp() == null){
-            this.postPersistTimeStamp();
+        if(this.getTimeStamp() == null){
+            postPersistTimeStamp();
         }
 
         if(this.getAuditLog() == null){
-            this.postPersistAuditLog();
+            postPersistAuditLog();
         }
     }
 
     @PostUpdate
     public void postUpdate(){
-        this.postUpdateTimeStamp();
-        this.postUpdateAuditLog();
+        postUpdateTimeStamp();
+        postUpdateAuditLog();
     }
 
     protected void postPersistTimeStamp() {
         EmbeddedTimeStamp timeStampObj = new EmbeddedTimeStamp();
 
-        if(this.getTimestamp().getCreatedAt() == null) {
+        if(getTimeStamp().getCreatedAt() == null) {
             timeStampObj.setCreatedAt(LocalDateTime.now());
         }
 
-        if(this.getTimestamp().getUpdatedAt() == null) {
+        if(getTimeStamp().getUpdatedAt() == null) {
             timeStampObj.setUpdatedAt(LocalDateTime.now());
         }
 
-        this.setTimestamp(timeStampObj);
+        this.setTimeStamp(timeStampObj);
     }
     protected void postPersistAuditLog() {
         EmbeddedAuditLog auditLogObj = new EmbeddedAuditLog();
@@ -62,7 +63,7 @@ public abstract class BaseEntity {
     }
 
     protected void postUpdateTimeStamp() {
-        this.getTimestamp().setUpdatedAt(LocalDateTime.now());
+        this.getTimeStamp().setUpdatedAt(LocalDateTime.now());
     }
 
     protected void postUpdateAuditLog() {

@@ -16,6 +16,7 @@ import java.sql.Time;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CASH_GENERIC_SYSTEM_PARAMETERS")
 public class SystemParameterEntity extends BaseEntity {
     @Column(name = "system_parameters_key")
