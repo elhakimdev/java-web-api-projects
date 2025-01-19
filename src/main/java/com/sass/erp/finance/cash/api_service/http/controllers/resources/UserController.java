@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import com.sass.erp.finance.cash.api_service.database.seeders.DatabaseSeeder;
+import com.sass.erp.finance.cash.api_service.database.factories.UserFactory;
 import com.sass.erp.finance.cash.api_service.http.resources.UserResource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
+import com.sass.erp.finance.cash.api_service.models.repositories.UserRepository;
 import com.sass.erp.finance.cash.api_service.services.UserService;
+import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,10 @@ public class UserController {
     protected UserService userService;
 
     @Autowired
-    protected DatabaseSeeder seeder;
+    protected UserRepository userRepository;
+
+    @Autowired
+    protected EntityManager entityManager;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -67,6 +72,13 @@ public class UserController {
 
     @GetMapping("/users/create")
     public void create(){
-        seeder.run();
+        this.createDummyUser();
+    }
+
+    protected void createDummyUser(){
+        UserFactory userFactory = new UserFactory();
+        userFactory.setRepository(userRepository);
+        userFactory.setEntityManager(entityManager);
+        userFactory.count(100).create();
     }
 }

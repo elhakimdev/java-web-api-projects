@@ -7,6 +7,8 @@ import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -14,10 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Component
+@Scope("prototype")
 public abstract class BaseFactory<T extends BaseEntity> {
 
     protected Logger logger = LoggerFactory.getLogger(BaseFactory.class);
 
+    @Autowired
     protected EntityManager entityManager;
 
     private static final int DEFAULT_COUNT = 1;
