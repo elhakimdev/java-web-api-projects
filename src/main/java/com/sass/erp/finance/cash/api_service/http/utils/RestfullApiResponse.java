@@ -15,13 +15,13 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestfullApiResponse<T> {
-  protected Optional<T> data;
-  protected String message;
   protected RestfullApiResponseStatus status;
+  protected String message;
   protected Integer statusCode;
   protected String statusText;
   protected Optional<RestfullApiResponseError> error;
   protected LocalDateTime timestamp;
+  protected Optional<T> data;
 
   public static RestfullApiResponse<?> toResponse(){
     return new RestfullApiResponse<>();

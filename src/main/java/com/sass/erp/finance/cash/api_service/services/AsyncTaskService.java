@@ -45,7 +45,7 @@ public class AsyncTaskService extends CommonService<AsyncTaskEntity, EmbeddedIde
 
     return Optional.ofNullable(this.asyncTaskRepository
       .findById(embeddedIdentifier)
-      .orElseThrow(() -> new EntityNotFoundException("Task with id: " + id + "not found")));
+      .orElseThrow(() -> new EntityNotFoundException("Task with id: " + id + " not found")));
   }
 
   public AsyncTaskEntity updateProgress(AsyncTaskEntity entity, double progress) {

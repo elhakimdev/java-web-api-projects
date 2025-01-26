@@ -15,12 +15,12 @@ public class RestfullApiResponseFactory {
     RestfullApiResponse<T> successResponse = new RestfullApiResponse<T>() {
 
     };
-    successResponse.setData(Optional.ofNullable(data));
     successResponse.setMessage(message);
     successResponse.setStatus(RestfullApiResponseStatus.SUCCESS);
-    successResponse.setError(Optional.empty());
     successResponse.setStatusCode(httpStatus.value());
     successResponse.setStatusText(httpStatus.getReasonPhrase());
+    successResponse.setError(Optional.empty());
+    successResponse.setData(Optional.ofNullable(data));
     successResponse.setTimestamp(LocalDateTime.now());
     return successResponse;
   }
@@ -41,12 +41,12 @@ public class RestfullApiResponseFactory {
     errorMap.setErrorMessage(error.getMessage());
     errorMap.setErrorType(error.getClass().getCanonicalName());
 
-    errorResponse.setData(Optional.empty());
     errorResponse.setMessage(message);
     errorResponse.setStatus(RestfullApiResponseStatus.FAILED);
     errorResponse.setStatusCode(httpStatus.value());
     errorResponse.setStatusText(httpStatus.getReasonPhrase());
     errorResponse.setError(Optional.of(errorMap));
+    errorResponse.setData(Optional.empty());
     errorResponse.setTimestamp(LocalDateTime.now());
     return errorResponse;
   }

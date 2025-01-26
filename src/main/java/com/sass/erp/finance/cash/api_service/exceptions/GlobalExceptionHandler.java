@@ -2,6 +2,7 @@ package com.sass.erp.finance.cash.api_service.exceptions;
 
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,5 +86,6 @@ public class GlobalExceptionHandler {
     exceptionStatusMapping.put(ConstraintViolationException.class, HttpStatus.UNPROCESSABLE_ENTITY);
     exceptionStatusMapping.put(NoResourceFoundException.class, HttpStatus.NOT_FOUND);
     exceptionStatusMapping.put(NoHandlerFoundException.class, HttpStatus.NOT_FOUND);
+    exceptionStatusMapping.put(EntityNotFoundException.class, HttpStatus.NOT_FOUND);
   }
 }
