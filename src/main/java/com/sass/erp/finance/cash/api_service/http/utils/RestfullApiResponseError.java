@@ -14,6 +14,7 @@ import java.util.Map;
 public class RestfullApiResponseError {
   protected String errorMessage;
   protected String errorType;
-  protected Integer errorCode;
+  protected String errorCode;
+  protected String errorTraceId;
   protected Map<String, Object> errorData;
 }

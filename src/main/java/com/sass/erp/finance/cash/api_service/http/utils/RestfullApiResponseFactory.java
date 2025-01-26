@@ -1,13 +1,9 @@
 package com.sass.erp.finance.cash.api_service.http.utils;
 
 import com.sass.erp.finance.cash.api_service.exceptions.BaseException;
-import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public class RestfullApiResponseFactory {
@@ -30,17 +26,20 @@ public class RestfullApiResponseFactory {
   }
 
   public static <E extends BaseException> RestfullApiResponse<E> failed(
-    E error,
+    Exception error,
     String message,
+    String code,
+    String traceId,
     HttpStatus httpStatus
   ) {
     RestfullApiResponse<E> errorResponse = new RestfullApiResponse<E>() {
     };
 
     RestfullApiResponseError errorMap = new RestfullApiResponseError();
-    errorMap.setErrorCode(error.getErrorCode());
+    errorMap.setErrorCode(code);
+    errorMap.setErrorTraceId(traceId);
     errorMap.setErrorMessage(error.getMessage());
-    errorMap.setErrorType(error.getErrorType());
+    errorMap.setErrorType(error.getClass().getCanonicalName());
 
     errorResponse.setData(Optional.empty());
     errorResponse.setMessage(message);

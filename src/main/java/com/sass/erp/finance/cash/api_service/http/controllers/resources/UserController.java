@@ -11,7 +11,9 @@ import com.sass.erp.finance.cash.api_service.http.resources.UserResource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
+import com.sass.erp.finance.cash.api_service.models.entities.generics.system.AsyncTaskEntity;
 import com.sass.erp.finance.cash.api_service.models.repositories.UserRepository;
+import com.sass.erp.finance.cash.api_service.services.AsyncTaskService;
 import com.sass.erp.finance.cash.api_service.services.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,14 +40,19 @@ public class UserController {
 
   protected UserService userService;
 
+  protected AsyncTaskService asyncTaskService;
+
   @Autowired
   protected UserRepository userRepository;
 
   @Autowired
   protected EntityManager entityManager;
 
-  public UserController(UserService userService) {
+  public UserController(
+    UserService userService, AsyncTaskService asyncTaskService
+  ) {
     this.userService = userService;
+    this.asyncTaskService = asyncTaskService;
   }
 
   @GetMapping("/users")
@@ -54,7 +61,7 @@ public class UserController {
     @RequestParam(defaultValue = "10") int size,
     HttpServletRequest request
   ) {
-    Page<UserEntity> users = this.userService.getCrudTaskService().index(page - 1, size);
+    Page<UserEntity> users = this.userService.index(page - 1, size);
 
     List<HashMap<String, Object>> userList = users
       .stream()
@@ -70,7 +77,11 @@ public class UserController {
       "users"
     );
 
-    RestfullApiResponse<Map<String, Object>> response = RestfullApiResponseFactory.success(paginateResponse, "List of all users data test", HttpStatus.OK);
+    RestfullApiResponse<Map<String, Object>> response = RestfullApiResponseFactory.success(
+      paginateResponse,
+      "List of all users data test",
+      HttpStatus.OK
+    );
 
     return ResponseEntity
       .status(HttpStatus.OK)
@@ -80,9 +91,18 @@ public class UserController {
   @GetMapping("/users/create")
   public HttpEntity<RestfullApiResponse<?>> create(){
 
-    this.createAsyncUserAndVerifieduser();
+    AsyncTaskEntity asyncTask = this.asyncTaskService.createNewAsyncTask("create_batch_user");
 
-    RestfullApiResponse<Object> response = RestfullApiResponseFactory.success(null, "Success creating dummy users", HttpStatus.CREATED);
+    this.createAsyncUser();
+
+    HashMap<String, Object> data = new HashMap<>();
+
+    data.put("taskId", asyncTask.getIdentifier().getUuid().toString());
+    data.put("taskName", asyncTask.getTaskName());
+    data.put("taskStatus", asyncTask.getTaskState().getState());
+    data.put("taskProgress", asyncTask.getTaskProgress());
+
+    RestfullApiResponse<Object> response = RestfullApiResponseFactory.success(data, "Success creating dummy users", HttpStatus.CREATED);
 
     return ResponseEntity
       .status(HttpStatus.CREATED)
@@ -90,26 +110,34 @@ public class UserController {
   }
 
   @Async
-  protected CompletableFuture<Void> createAsyncUserAndVerifieduser() {
-    // Perform both tasks in parallel to further reduce total time
+  protected void createAsyncUser() {
     CompletableFuture<Void> dummyUsers = CompletableFuture.runAsync(this::createDummyUser);
     CompletableFuture<Void> verifiedUsers = CompletableFuture.runAsync(this::createVerifiedUser);
-
-    // Combine both tasks and wait for them to complete
-    return CompletableFuture.allOf(dummyUsers, verifiedUsers);
+    CompletableFuture.allOf(dummyUsers, verifiedUsers);
   }
 
   protected void createDummyUser(){
+    int count = 1000;
     UserFactory userFactory = new UserFactory();
     userFactory.setRepository(userRepository);
     userFactory.setEntityManager(entityManager);
-    userFactory.count(1000).create();
+    userFactory.count(count).create(progress -> {
+      double createdProgress = calculateProgress(progress, count);
+
+    });
   }
 
   protected void createVerifiedUser() {
+    int count = 1000;
     UserFactory userFactory = new UserFactory();
     userFactory.setRepository(userRepository);
     userFactory.setEntityManager(entityManager);
-    userFactory.verifiedUser().count(1000).create();
+    userFactory.verifiedUser().count(count).create(progress -> {
+      double createdProgress = calculateProgress(progress, count);
+    });
+  }
+
+  protected double calculateProgress(int created, int totalCount) {
+    return ((double) created / totalCount * 100);
   }
 }

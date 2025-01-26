@@ -11,10 +11,6 @@ public class UserService extends CommonService<UserEntity, EmbeddedIdentifier> {
   @Autowired
   protected UserRepository userRepository;
 
-  public UserService(CrudTaskService<UserEntity, EmbeddedIdentifier> crudTaskService) {
-    super(crudTaskService);
-  }
-
   @Override
   protected BaseRepository<UserEntity, EmbeddedIdentifier> getRepository() {
     return this.userRepository;

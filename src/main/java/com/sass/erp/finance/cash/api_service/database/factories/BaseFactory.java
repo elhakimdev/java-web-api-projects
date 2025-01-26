@@ -71,9 +71,20 @@ public abstract class BaseFactory<T extends BaseEntity> {
    */
   public void create(){
     if (this.count == 0) {
-      this.create(DEFAULT_COUNT);
+      this.create(DEFAULT_COUNT, progress -> {});
     } else {
-      this.create(this.count);
+      this.create(this.count, progress -> {});
+    }
+  }
+
+  /**
+   * Proxy method for running factory
+   */
+  public void create(Consumer<Integer> progressFn){
+    if (this.count == 0) {
+      this.create(DEFAULT_COUNT, progressFn);
+    } else {
+      this.create(this.count, progressFn);
     }
   }
 
@@ -82,14 +93,15 @@ public abstract class BaseFactory<T extends BaseEntity> {
    *
    * @param count The number of entity should be created.
    */
-  public void create(int count){
-    logger.info("Called create");
+  public void create(int count, Consumer<Integer> callbackFn){
     for (int i = 0; i < count; i++) {
       T entity = preDefineIdentifier((prePersist(make())));
       states.forEach(state -> state.accept(entity));
-      logger.info("Creating entity: {} with value: {}", entity.getClass(), entity);
       getRepository().saveAndFlush(entity);
-      logger.info("Saving entity: {} with value: {}", entity.getClass(), entity);
+
+      if(i % 10 == 0) {
+        callbackFn.accept(i);
+      }
     }
 
     getRepository().flush();
