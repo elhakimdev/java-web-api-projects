@@ -3,6 +3,7 @@ import java.lang.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import com.sass.erp.finance.cash.api_service.database.factories.UserFactory;
 import com.sass.erp.finance.cash.api_service.http.resources.PaginateResource;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -77,8 +79,8 @@ public class UserController {
 
   @GetMapping("/users/create")
   public HttpEntity<RestfullApiResponse<?>> create(){
-    this.createDummyUser();
-    this.createVerifiedUser();
+
+    this.createAsyncUserAndVerifieduser();
 
     RestfullApiResponse<Object> response = RestfullApiResponseFactory.success(null, "Success creating dummy users", HttpStatus.CREATED);
 
@@ -87,17 +89,27 @@ public class UserController {
       .body(response);
   }
 
+  @Async
+  protected CompletableFuture<Void> createAsyncUserAndVerifieduser() {
+    // Perform both tasks in parallel to further reduce total time
+    CompletableFuture<Void> dummyUsers = CompletableFuture.runAsync(this::createDummyUser);
+    CompletableFuture<Void> verifiedUsers = CompletableFuture.runAsync(this::createVerifiedUser);
+
+    // Combine both tasks and wait for them to complete
+    return CompletableFuture.allOf(dummyUsers, verifiedUsers);
+  }
+
   protected void createDummyUser(){
     UserFactory userFactory = new UserFactory();
     userFactory.setRepository(userRepository);
     userFactory.setEntityManager(entityManager);
-    userFactory.count(100).create();
+    userFactory.count(1000).create();
   }
 
   protected void createVerifiedUser() {
     UserFactory userFactory = new UserFactory();
     userFactory.setRepository(userRepository);
     userFactory.setEntityManager(entityManager);
-    userFactory.verifiedUser().count(100).create();
+    userFactory.verifiedUser().count(1000).create();
   }
 }
