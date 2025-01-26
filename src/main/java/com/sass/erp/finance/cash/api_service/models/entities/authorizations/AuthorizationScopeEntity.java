@@ -14,9 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_AUTHORIZATION_SCOPES")
 public class AuthorizationScopeEntity extends BaseEntity {
-    @Column(name = "authorization_scope_name")
-    private String authorizationScopeName;
+  @Column(name = "authorization_scope_name")
+  private String authorizationScopeName;
 
-    @Column(name = "authorization_scope_description")
-    private String authorizationScopeDescription;
+  @Column(name = "authorization_scope_description")
+  private String authorizationScopeDescription;
 }

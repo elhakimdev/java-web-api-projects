@@ -7,8 +7,10 @@ import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;
 import com.sass.erp.finance.cash.api_service.models.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.Setter;
+import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,62 +22,55 @@ import java.util.UUID;
 @Scope("prototype")
 public class UserFactory extends BaseFactory<UserEntity> {
 
-    @Autowired
-    protected UserRepository repository;
+  @Autowired
+  protected UserRepository repository;
 
-    @Autowired
-    protected EntityManager entityManager;
+  @Autowired
+  protected EntityManager entityManager;
 
-    @Override
-    public UserEntity definition() {
-        String systemTime = String.valueOf(System.currentTimeMillis());
+  @Override
+  public UserEntity definition() {
+    UserEntity entity = new UserEntity();
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    String defaultPassword = "PASSKIT01";
+    String encodedPass = encoder.encode(defaultPassword);
+    Faker faker = this.getFaker();
 
-        UserEntity entity = new UserEntity();
-        EmbeddedIdentifier embeddedIdentifier = new EmbeddedIdentifier();
-        EmbeddedExternalID embeddedExternalID = new EmbeddedExternalID();
+    // Generate KCMT00000 format
+    String generalCode = "KCMT";
+    String sequenceCode = String.format("%05d", faker.number().numberBetween(0, 99999));
+    String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
 
-        UUID uuid = UUID.randomUUID();
-        embeddedIdentifier.setUuid(uuid);
+    String username = generalCode + sequenceCode + date + time;
 
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        String generatedCode = now.format(formatter);
+    entity.setUserUsername(username);
+    entity.setUserEmail(username + "@service.com");
+    entity.setUserPassword(encodedPass);
+    entity.setUserIsActive(false);
+    entity.setUserIsMigrated(false);
+    entity.setUserIsVerified(false);
+    entity.setUserIsLocked(false);
+    entity.setUserIsExternal(false);
+    entity.setUserEmailVerifiedAt(LocalDateTime.now());
+    return entity;
+  }
 
+  @Override
+  protected BaseRepository<UserEntity, ?> getRepository() {
+    return this.repository;
+  }
 
-        embeddedExternalID.setExternalId("USR-EXT-REF" + generatedCode);
-        embeddedExternalID.setSystemRefId("USR-SYS-REF" + generatedCode);
-        embeddedExternalID.setUniqueId("USR-U-REF" + generatedCode);
-        embeddedExternalID.setDisplayId("USR-DSP-REF" + generatedCode);
+  protected EntityManager getEntityManager(){
+    return this.entityManager;
+  }
 
-        entity.setIdentifier(embeddedIdentifier);
-        entity.setExternalIdentifier(embeddedExternalID);
-        entity.setUserUsername("KC_MT01" + systemTime);
-        entity.setUserEmail("KC_MT01" + systemTime + "@service.com");
-        entity.setUserPassword("PASSKIT01" + systemTime);
-        entity.setUserIsActive(false);
-        entity.setUserIsMigrated(false);
-        entity.setUserIsVerified(false);
-        entity.setUserIsLocked(false);
-        entity.setUserIsExternal(false);
-        entity.setUserEmailVerifiedAt(LocalDateTime.now());
-        return entity;
-    }
-
-    @Override
-    protected BaseRepository<UserEntity, ?> getRepository() {
-        return this.repository;
-    }
-
-    protected EntityManager getEntityManager(){
-        return this.entityManager;
-    }
-
-    public UserFactory verifiedUser(){
-        return (UserFactory) this.state(user -> {
-            user.setUserUsername("KC_MT01VERIFIED");
-            user.setUserEmail("KC_MT01VERIFIED@service.com");
-            user.setUserPassword("PASSKIT01VERIFIED");
-            user.setUserIsVerified(true);
-        });
-    }
+  public UserFactory verifiedUser(){
+    return (UserFactory) this.state(user -> {
+      user.setUserUsername("KC_MT01VERIFIED");
+      user.setUserEmail("KC_MT01VERIFIED@service.com");
+      user.setUserPassword("PASSKIT01VERIFIED");
+      user.setUserIsVerified(true);
+    });
+  }
 }

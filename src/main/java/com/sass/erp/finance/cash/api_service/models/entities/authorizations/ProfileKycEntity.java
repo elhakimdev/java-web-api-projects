@@ -17,22 +17,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_PROFILE_KYC")
 public class ProfileKycEntity extends BaseEntity {
-    @Column(name = "profile_kyc_status")
-    private String kycStatus;
+  @Column(name = "profile_kyc_status")
+  private String kycStatus;
 
-    @Column(name = "profile_kyc_id_doc_type")
-    private String kycIdentityDocumentType;
+  @Column(name = "profile_kyc_id_doc_type")
+  private String kycIdentityDocumentType;
 
-    @Column(name = "profile_kyc_id_doc_no")
-    private Long kycIdentityDocumentNumber;
+  @Column(name = "profile_kyc_id_doc_no")
+  private Long kycIdentityDocumentNumber;
 
-    @Column(name = "profile_kyc_verified_at")
-    private LocalDateTime kycIdentityVerifiedAt;
+  @Column(name = "profile_kyc_verified_at")
+  private LocalDateTime kycIdentityVerifiedAt;
 
-    @Column(name = "profile_kyc_verified_by")
-    private String kycIdentityVerifiedBy;
+  @Column(name = "profile_kyc_verified_by")
+  private String kycIdentityVerifiedBy;
 
-    @OneToOne
-    @JoinColumn(name = "profile_id")
-    private ProfileEntity profile;
+  @OneToOne
+  @JoinColumn(name = "profile_id")
+  private ProfileEntity profile;
 }

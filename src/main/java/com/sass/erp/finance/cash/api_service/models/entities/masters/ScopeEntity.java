@@ -14,9 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "CASH_MASTERS_SCOPE_CATEGORY")
 public class ScopeEntity extends BaseEntity {
-    @Column(name = "scope_name")
-    private String scopeName;
+  @Column(name = "scope_name")
+  private String scopeName;
 
-    @Column(name = "scope_description")
-    private String scopeDescription;
+  @Column(name = "scope_description")
+  private String scopeDescription;
 }

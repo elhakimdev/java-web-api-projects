@@ -1,5 +1,6 @@
 package com.sass.erp.finance.cash.api_service.http.utils;
 
+import com.sass.erp.finance.cash.api_service.exceptions.BaseException;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -10,47 +11,44 @@ import java.util.List;
 import java.util.Optional;
 
 public class RestfullApiResponseFactory {
-    public static <T> RestfullApiResponse<T> success(
-            T data,
-            String message,
-            Optional<HttpStatus> statusCode
-    ) {
-        RestfullApiResponse<T> successResponse = new RestfullApiResponse<T>() {
+  public static <T> RestfullApiResponse<T> success(
+    T data,
+    String message,
+    HttpStatus httpStatus
+  ) {
+    RestfullApiResponse<T> successResponse = new RestfullApiResponse<T>() {
 
-        };
-        successResponse.setData(Optional.ofNullable(data));
-        successResponse.setMessage(message);
-        successResponse.setStatus(RestfullApiResponseStatus.SUCCESS);
-        successResponse.setError(Optional.empty());
-        if(statusCode.isEmpty()){
-            successResponse.setStatusCode(Optional.of(HttpStatus.OK));
-        }
-        if(statusCode.isPresent()) {
-            successResponse.setStatusCode(statusCode);
-        }
-        successResponse.setTimestamp(LocalDateTime.now());
-        return successResponse;
-    }
+    };
+    successResponse.setData(Optional.ofNullable(data));
+    successResponse.setMessage(message);
+    successResponse.setStatus(RestfullApiResponseStatus.SUCCESS);
+    successResponse.setError(Optional.empty());
+    successResponse.setStatusCode(httpStatus.value());
+    successResponse.setStatusText(httpStatus.getReasonPhrase());
+    successResponse.setTimestamp(LocalDateTime.now());
+    return successResponse;
+  }
 
-    public static <E> RestfullApiResponse<?> failed(
-            E error,
-            String message,
-            Optional<HttpStatus> statusCode
-    ) {
-        RestfullApiResponse successResponse = new RestfullApiResponse<>() {
+  public static <E extends BaseException> RestfullApiResponse<E> failed(
+    E error,
+    String message,
+    HttpStatus httpStatus
+  ) {
+    RestfullApiResponse<E> errorResponse = new RestfullApiResponse<E>() {
+    };
 
-        };
-        successResponse.setData(Optional.empty());
-        successResponse.setMessage(message);
-        successResponse.setStatus(RestfullApiResponseStatus.SUCCESS);
-        successResponse.setError(Optional.ofNullable(error));
-        if(statusCode.isEmpty()){
-            successResponse.setStatusCode(Optional.of(HttpStatus.BAD_REQUEST));
-        }
-        if(statusCode.isPresent()) {
-            successResponse.setStatusCode(statusCode);
-        }
-        successResponse.setTimestamp(LocalDateTime.now());
-        return successResponse;
-    }
+    RestfullApiResponseError errorMap = new RestfullApiResponseError();
+    errorMap.setErrorCode(error.getErrorCode());
+    errorMap.setErrorMessage(error.getMessage());
+    errorMap.setErrorType(error.getErrorType());
+
+    errorResponse.setData(Optional.empty());
+    errorResponse.setMessage(message);
+    errorResponse.setStatus(RestfullApiResponseStatus.FAILED);
+    errorResponse.setStatusCode(httpStatus.value());
+    errorResponse.setStatusText(httpStatus.getReasonPhrase());
+    errorResponse.setError(Optional.of(errorMap));
+    errorResponse.setTimestamp(LocalDateTime.now());
+    return errorResponse;
+  }
 }

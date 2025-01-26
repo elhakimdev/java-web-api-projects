@@ -14,9 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_ACCOUNT_GROUPS")
 public class AccountGroupEntity extends BaseEntity {
-    @Column(name = "account_group_name")
-    private String accountGroupName;
+  @Column(name = "account_group_name")
+  private String accountGroupName;
 
-    @Column(name = "account_group_description")
-    private String accountGroupDescription;
+  @Column(name = "account_group_description")
+  private String accountGroupDescription;
 }

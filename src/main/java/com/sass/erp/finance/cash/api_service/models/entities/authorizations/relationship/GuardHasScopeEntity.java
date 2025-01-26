@@ -16,15 +16,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GuardHasScopeEntity extends BaseEntity {
-    @Column(name = "guard_has_scope_assigned_at")
-    private LocalDateTime assignedAt;
+  @Column(name = "guard_has_scope_assigned_at")
+  private LocalDateTime assignedAt;
 
-    @Column(name = "guard_has_scope_assigned_by")
-    private LocalDateTime assignedBy;
+  @Column(name = "guard_has_scope_assigned_by")
+  private LocalDateTime assignedBy;
 
-    @Column(name = "guard_has_scope_unassigned_at")
-    private LocalDateTime unassignedAt;
+  @Column(name = "guard_has_scope_unassigned_at")
+  private LocalDateTime unassignedAt;
 
-    @Column(name = "guard_has_scope_unassigned_by")
-    private LocalDateTime unassignedBy;
+  @Column(name = "guard_has_scope_unassigned_by")
+  private LocalDateTime unassignedBy;
 }

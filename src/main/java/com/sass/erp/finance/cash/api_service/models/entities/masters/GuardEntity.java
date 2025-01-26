@@ -14,9 +14,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GuardEntity extends BaseEntity {
-    @Column(name = "guard_name")
-    private String guardName;
+  @Column(name = "guard_name")
+  private String guardName;
 
-    @Column(name = "guard_description")
-    private String guardDescription;
+  @Column(name = "guard_description")
+  private String guardDescription;
 }

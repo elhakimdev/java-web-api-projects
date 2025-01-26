@@ -12,8 +12,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestfullApiResponseError {
-    protected String errorCode;
-    protected String errorMessage;
-    protected String errorExceptionType;
-    protected Map<String, Object> errorData;
+  protected String errorMessage;
+  protected String errorType;
+  protected Integer errorCode;
+  protected Map<String, Object> errorData;
 }

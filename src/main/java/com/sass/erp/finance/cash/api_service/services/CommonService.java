@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Getter
 @Service
 public abstract class CommonService<T extends BaseEntity, ID> {
-    protected abstract BaseRepository<T, ID> getRepository();
+  protected abstract BaseRepository<T, ID> getRepository();
 
-    protected final CrudTaskService<T, ID> crudTaskService;
+  protected final CrudTaskService<T, ID> crudTaskService;
 
-    public CommonService(CrudTaskService<T, ID> crudTaskService) {
-        this.crudTaskService = crudTaskService;
-    }
+  public CommonService(CrudTaskService<T, ID> crudTaskService) {
+    this.crudTaskService = crudTaskService;
+  }
 }

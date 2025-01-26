@@ -11,15 +11,15 @@ import java.io.Serializable;
 @ToString
 @Embeddable
 public class EmbeddedAuditLog {
-    @Column(name = "created_by")
-    private String createdBy;
+  @Column(name = "created_by")
+  private String createdBy;
 
-    @Column(name = "last_updated_by")
-    private String lastUpdatedBy;
+  @Column(name = "last_updated_by")
+  private String lastUpdatedBy;
 
-    @Column(name = "last_deleted_by")
-    private String lastDeletedBy;
+  @Column(name = "last_deleted_by")
+  private String lastDeletedBy;
 
-    @Column(name = "last_restored_by")
-    private String lastRestoredBy;
+  @Column(name = "last_restored_by")
+  private String lastRestoredBy;
 }
