@@ -24,6 +24,16 @@ public class AsyncTaskService extends CommonService<AsyncTaskEntity, EmbeddedIde
     return asyncTaskRepository;
   }
 
+  @Override
+  protected AsyncTaskEntity createAttributes(AsyncTaskEntity entity, Object attributes) {
+    return null;
+  }
+
+  @Override
+  protected AsyncTaskEntity updateAttributes(AsyncTaskEntity entity, Object attributes) {
+    return null;
+  }
+
   public AsyncTaskEntity createNewAsyncTask(String name){
     AsyncTaskEntity asyncTaskEntity = new AsyncTaskEntity();
 
@@ -36,16 +46,6 @@ public class AsyncTaskService extends CommonService<AsyncTaskEntity, EmbeddedIde
         this.prePersistIdentifier(asyncTaskEntity)
       )
     );
-  }
-
-  public Optional<AsyncTaskEntity> find(String id) {
-    UUID uuid = UUID.fromString(id);
-    EmbeddedIdentifier embeddedIdentifier = new EmbeddedIdentifier();
-    embeddedIdentifier.setUuid(uuid);
-
-    return Optional.ofNullable(this.asyncTaskRepository
-      .findById(embeddedIdentifier)
-      .orElseThrow(() -> new EntityNotFoundException("Task with id: " + id + " not found")));
   }
 
   public AsyncTaskEntity updateProgress(AsyncTaskEntity entity, double progress) {

@@ -1,52 +1,56 @@
 package com.sass.erp.finance.cash.api_service.http.utils;
 
 import com.sass.erp.finance.cash.api_service.exceptions.BaseException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class RestfullApiResponseFactory {
-  public static <T> RestfullApiResponse<T> success(
+  public static <T, E> RestfullApiResponse<T, E> success(
     T data,
     String message,
     HttpStatus httpStatus
   ) {
-    RestfullApiResponse<T> successResponse = new RestfullApiResponse<T>() {
 
-    };
+    RestfullApiResponse<T, E> successResponse = new RestfullApiResponse<>();
+    RestfullApiResponseData<T> responseData = new RestfullApiResponseData<>(data);
+
     successResponse.setMessage(message);
     successResponse.setStatus(RestfullApiResponseStatus.SUCCESS);
     successResponse.setStatusCode(httpStatus.value());
     successResponse.setStatusText(httpStatus.getReasonPhrase());
-    successResponse.setError(Optional.empty());
-    successResponse.setData(Optional.ofNullable(data));
+    successResponse.setError(null);
+    successResponse.setData(responseData.data());
     successResponse.setTimestamp(LocalDateTime.now());
     return successResponse;
   }
 
-  public static <E extends BaseException> RestfullApiResponse<E> failed(
+  public static <T, E extends BaseException> RestfullApiResponse<T, E> failed(
     Exception error,
     String message,
     String code,
     String traceId,
     HttpStatus httpStatus
   ) {
-    RestfullApiResponse<E> errorResponse = new RestfullApiResponse<E>() {
+    RestfullApiResponse<T, E> errorResponse = new RestfullApiResponse<T, E>() {
     };
 
-    RestfullApiResponseError errorMap = new RestfullApiResponseError();
-    errorMap.setErrorCode(code);
-    errorMap.setErrorTraceId(traceId);
-    errorMap.setErrorMessage(error.getMessage());
-    errorMap.setErrorType(error.getClass().getCanonicalName());
+    RestfullApiResponseError<E> errorMapping = new RestfullApiResponseError<E>(
+      message,
+      error.getClass().getCanonicalName(),
+      code,
+      traceId,
+      List.of()
+    );
 
     errorResponse.setMessage(message);
     errorResponse.setStatus(RestfullApiResponseStatus.FAILED);
     errorResponse.setStatusCode(httpStatus.value());
     errorResponse.setStatusText(httpStatus.getReasonPhrase());
-    errorResponse.setError(Optional.of(errorMap));
-    errorResponse.setData(Optional.empty());
+    errorResponse.setError(errorMapping);
+    errorResponse.setData(null);
     errorResponse.setTimestamp(LocalDateTime.now());
     return errorResponse;
   }

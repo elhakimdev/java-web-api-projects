@@ -3,6 +3,7 @@ package com.sass.erp.finance.cash.api_service.exceptions;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
    * @param httpStatus The HttpStatus.
    * @return The Json Response.
    */
-  protected ResponseEntity<RestfullApiResponse<BaseException>> renderException(
+  protected ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> renderException(
     Exception exception,
     HttpStatus httpStatus
   ) {
@@ -46,7 +48,7 @@ public class GlobalExceptionHandler {
 
     logger.error("TraceLogID: {}, Exception caught: {}", traceLogId, exception.getMessage(), exception);
 
-    RestfullApiResponse<BaseException> response = RestfullApiResponseFactory.failed(
+    RestfullApiResponse<ObjectUtils.Null, BaseException> response = RestfullApiResponseFactory.failed(
       exception,
       exception.getMessage(),
       "0000X00000",
@@ -60,15 +62,13 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * General Exception Handler
-   *
+   * General Exception Handler.
    * Handle all exception and return json response.
    *
-   * @param exception
-   * @return
+   * @param exception Exception class
    */
   @ExceptionHandler(Exception.class)
-  protected ResponseEntity<RestfullApiResponse<BaseException>> handleGenericException(Exception exception) {
+  protected ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleGenericException(Exception exception) {
 
     HttpStatus httpStatus = exceptionStatusMapping.getOrDefault(
       exception.getClass(),
