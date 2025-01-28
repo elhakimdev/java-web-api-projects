@@ -7,6 +7,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface BaseRepository<T, ID extends EmbeddedIdentifier> extends JpaRepository<T, ID> {
-  T findByIdentifier(EmbeddedIdentifier id) throws EntityNotFoundException;
+  T findByIdentifier(EmbeddedIdentifier identifier) throws EntityNotFoundException;
 }
 

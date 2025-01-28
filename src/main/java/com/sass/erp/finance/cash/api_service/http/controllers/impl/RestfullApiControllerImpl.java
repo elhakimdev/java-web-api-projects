@@ -8,13 +8,18 @@ import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.AbstractMap;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.UUID;
 
 public class RestfullApiControllerImpl<
   T extends BaseEntity,
@@ -26,9 +31,6 @@ public class RestfullApiControllerImpl<
   @Autowired
   protected Resource<T> resource;
 
-
-  // Internal usage only from override in child class
-
   public String getResourceName() {
     return "data";
   }
@@ -37,17 +39,31 @@ public class RestfullApiControllerImpl<
     return this.getResourceName() + "'s";
   }
 
-  // Crud Method
   @GetMapping
   @Override
-  public HttpEntity<RestfullApiResponse<List<AbstractMap<String, Object>>, Object>> index() {
+  public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> index(
+    @RequestParam(defaultValue = "1") int page,
+    @RequestParam(defaultValue = "10") int size
+  ) {
 
-    Stream<AbstractMap<String, Object>> resultStream = this.service.findAll().stream().map((data) -> {
-      this.resource.setEntity(data);
-      return this.resource.toResponse(data);
-    });
+    Page<T> pageable = this.service.findAll(PageRequest.of(page, size));
 
-    RestfullApiResponse<List<AbstractMap<String, Object>>, Object> response = RestfullApiResponseFactory.success(resultStream.toList(), "List " + this.getResourceCollectionsName(), HttpStatus.OK);
+    Map<String, Object> paginatedCollectionsResponse = this.resource.toPaginatedCollectionsResponse(pageable, this.request);
+
+    RestfullApiResponse<Map<String, Object>, Object> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "List " + this.getResourceCollectionsName(), HttpStatus.OK);
+
+    return ResponseEntity.status(response.getStatusCode()).body(response);
+  }
+
+  @GetMapping("/{uuid}")
+  @Override
+  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> show(
+    @PathVariable String uuid
+  ) {
+    EmbeddedIdentifier embeddedIdentifier = new EmbeddedIdentifier(UUID.fromString(uuid));
+    T byIdentifier = this.service.findByIdentifier(embeddedIdentifier);
+
+    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceCollectionsName(), HttpStatus.OK);
 
     return ResponseEntity.status(response.getStatusCode()).body(response);
   }

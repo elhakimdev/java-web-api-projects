@@ -6,7 +6,9 @@ import org.springframework.http.HttpEntity;
 
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 public interface RestfullApiController<T extends BaseEntity> {
-  HttpEntity<RestfullApiResponse<List<AbstractMap<String, Object>>, Object>> index();
+  HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> index(int page, int size);
+  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> show(String uuid);
 }

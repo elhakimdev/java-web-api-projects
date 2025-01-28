@@ -2,6 +2,9 @@ package com.sass.erp.finance.cash.api_service.services;
 
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import java.util.List;
 
 public interface RestfullApiService<T, ID extends EmbeddedIdentifier> {
@@ -9,7 +12,11 @@ public interface RestfullApiService<T, ID extends EmbeddedIdentifier> {
    * Fetch all entities.
    * @return All entities.
    */
-  List<T> findAll();
+  List<T> findAll();  /**
+   * Fetch all entities.
+   * @return All entities.
+   */
+  Page<T> findAll(PageRequest pageRequest);
 
   /**
    * Find entity by given UUID
@@ -18,6 +25,8 @@ public interface RestfullApiService<T, ID extends EmbeddedIdentifier> {
    * @throws EntityNotFoundException Exception thrown where entity not found.
    */
   T findByUUID(ID id) throws EntityNotFoundException;
+
+  T findByIdentifier(EmbeddedIdentifier id) throws EntityNotFoundException;
 
   /**
    * Sve new entity.

@@ -8,7 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.beans.FeatureDescriptor;
@@ -35,6 +36,16 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
   }
 
   /**
+   * Fetch all entities.
+   *
+   * @return All entities.
+   */
+  @Override
+  public Page<T> findAll(PageRequest pageRequest) {
+    return repository.findAll(pageRequest);
+  }
+
+  /**
    * Find entity by given UUID
    *
    * @param id The embedded UUID associated for this entity
@@ -46,6 +57,20 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
     return Optional
       .ofNullable(repository.findByIdentifier(id))
       .orElseThrow(() -> new EntityNotFoundException("Entity with id: ["+ id.getUuid().toString() +" ] not found"));
+  }
+
+  /**
+   * Find entity by given UUID
+   *
+   * @param embeddedIdentifier The embedded UUID associated for this entity
+   * @return The entity.
+   * @throws EntityNotFoundException Exception thrown where entity not found.
+   */
+  @Override
+  public T findByIdentifier(EmbeddedIdentifier embeddedIdentifier) throws EntityNotFoundException {
+    return Optional
+      .ofNullable(repository.findByIdentifier(embeddedIdentifier))
+      .orElseThrow(() -> new EntityNotFoundException("Entity with id: ["+ embeddedIdentifier.getUuid().toString() +" ] not found"));
   }
 
   /**
