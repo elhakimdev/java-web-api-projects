@@ -6,9 +6,9 @@ import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;
 import com.sass.erp.finance.cash.api_service.services.AdvancedSearchService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -62,25 +62,78 @@ public class AdvancedSearchServiceImpl<T extends BaseEntity, ID extends Embedded
     return repository.findAll(spec, transformPage(pageable));
   }
 
+  /**
+   * Build filter spec.
+   *
+   * @param filter Filter to build.
+   * @return The spec.
+   */
   private Specification<T> buildFilter(AdvanceSearchRequest.Filter filter) {
     return (root, query, criteriaBuilder) -> {
       Path<Object> path = root.get(filter.getField());
+
       switch (filter.getOperator()) {
         case FilterOperatorRequest.GREATER_THAN_OR_EQUAL:
           return criteriaBuilder.greaterThanOrEqualTo(path.as(String.class), filter.getValue().toString());
+        case FilterOperatorRequest.GREATER_THAN:
+          return criteriaBuilder.greaterThan(path.as(String.class), filter.getValue().toString());
+        case FilterOperatorRequest.LESS_THAN_OR_EQUAL:
+          return criteriaBuilder.lessThanOrEqualTo(path.as(String.class), filter.getValue().toString());
+        case FilterOperatorRequest.LESS_THAN:
+          return criteriaBuilder.lessThan(path.as(String.class), filter.getValue().toString());
         case FilterOperatorRequest.EQUAL:
-          return criteriaBuilder.equal(path, filter.getValue());
+          return criteriaBuilder.equal(path.as(String.class), filter.getValue().toString());
+        case FilterOperatorRequest.NOT_EQUAL:
+          return criteriaBuilder.notEqual(path.as(String.class), filter.getValue().toString());
+        case FilterOperatorRequest.LIKE:
+          return criteriaBuilder.like(path.as(String.class), "%" + filter.getValue().toString() + "%");
+        case FilterOperatorRequest.NOT_LIKE:
+          return criteriaBuilder.notLike(path.as(String.class), "%" + filter.getValue().toString() + "%");
+        case FilterOperatorRequest.ILIKE:
+          return criteriaBuilder.like(criteriaBuilder.lower(path.as(String.class)), "%" + filter.getValue().toString().toLowerCase() + "%");
+        case FilterOperatorRequest.NOT_ILIKE:
+          return criteriaBuilder.notLike(criteriaBuilder.lower(path.as(String.class)), "%" + filter.getValue().toString().toLowerCase() + "%");
         case FilterOperatorRequest.IN:
           CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(path);
           ((List<?>) filter.getValue()).forEach(inClause::value);
           return inClause;
-        // Add more operators here...
+        case FilterOperatorRequest.NOT_IN:
+          CriteriaBuilder.In<Object> notInClause = criteriaBuilder.in(path);
+          ((List<?>) filter.getValue()).forEach(notInClause::value);
+          return criteriaBuilder.not(notInClause);
+        case FilterOperatorRequest.ALL_IN:
+          // This will require some custom logic based on what you define as "ALL IN" in your business logic
+          return buildAllInOperator(path, filter.getValue(), criteriaBuilder);
+        case FilterOperatorRequest.ANY_IN:
+          // This will require some custom logic based on what you define as "ANY IN" in your business logic
+          return buildAnyInOperator(path, filter.getValue(), criteriaBuilder);
         default:
           return null;
       }
     };
   }
 
+  private Predicate buildAllInOperator(Path<Object> path, Object value, CriteriaBuilder criteriaBuilder) {
+    // Example logic for ALL IN (you may need to adjust based on your business rules)
+    // Here, I'm assuming ALL IN means the value must exist in all of a list (this is a simplified version)
+    CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(path);
+    ((List<?>) value).forEach(inClause::value);
+    return criteriaBuilder.and(inClause); // Example: all items in the list should match
+  }
+
+  private Predicate buildAnyInOperator(Path<Object> path, Object value, CriteriaBuilder criteriaBuilder) {
+    // Example logic for ANY IN (you may need to adjust based on your business rules)
+    // Here, I'm assuming ANY IN means at least one value in the list matches
+    CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(path);
+    ((List<?>) value).forEach(inClause::value);
+    return criteriaBuilder.or(inClause); // Example: any item in the list should match
+  }
+
+  /**
+   * Search by given value.
+   * @param searchValue The search value.
+   * @return The specification.
+   */
   private Specification<T> searchByValue(String searchValue) {
     return (root, query, criteriaBuilder) -> {
       // Example for a 'search' implementation on the 'name' field (or other relevant fields)
@@ -88,6 +141,12 @@ public class AdvancedSearchServiceImpl<T extends BaseEntity, ID extends Embedded
     };
   }
 
+  /**
+   * Build sort spec.
+   *
+   * @param sort The sort.
+   * @return The specification.
+   */
   private Specification<T> buildSort(AdvanceSearchRequest.Sort sort) {
     return (root, query, criteriaBuilder) -> {
       // Set the sorting order for the query (this doesn't need to return a Predicate)
