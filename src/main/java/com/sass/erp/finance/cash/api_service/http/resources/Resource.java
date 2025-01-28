@@ -18,6 +18,8 @@ import java.util.*;
 public abstract class Resource<T> {
   protected T entity;
 
+  protected String name;
+
   protected abstract HashMap<String, Object> toCollections();
 
   protected abstract HashMap<String, Object> toResource();
