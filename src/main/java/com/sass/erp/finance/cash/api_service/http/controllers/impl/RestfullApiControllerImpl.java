@@ -1,6 +1,7 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl;
 
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
+import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
@@ -10,12 +11,11 @@ import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -64,6 +64,21 @@ public class RestfullApiControllerImpl<
     T byIdentifier = this.service.findByIdentifier(embeddedIdentifier);
 
     RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceCollectionsName(), HttpStatus.OK);
+
+    return ResponseEntity.status(response.getStatusCode()).body(response);
+  }
+
+  @PostMapping("/search")
+  @Override
+  public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> search(
+    @RequestBody AdvanceSearchRequest request, Pageable pageable
+  ) {
+
+    Page<T> page = this.service.search(request, pageable);
+
+    Map<String, Object> paginatedCollectionsResponse = this.resource.toPaginatedCollectionsResponse(page, this.request);
+
+    RestfullApiResponse<Map<String, Object>, Object> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "Search result of " + this.getResourceCollectionsName(), HttpStatus.OK);
 
     return ResponseEntity.status(response.getStatusCode()).body(response);
   }

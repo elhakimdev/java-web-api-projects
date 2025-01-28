@@ -1,13 +1,17 @@
 package com.sass.erp.finance.cash.api_service.services;
 
+import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface RestfullApiService<T, ID extends EmbeddedIdentifier> {
+
+  Page<T> search(AdvanceSearchRequest request, Pageable pageable);
   /**
    * Fetch all entities.
    * @return All entities.

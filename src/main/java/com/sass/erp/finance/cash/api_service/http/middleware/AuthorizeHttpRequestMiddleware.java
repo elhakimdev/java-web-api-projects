@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 public class AuthorizeHttpRequestMiddleware {
   public static void enableHttpMiddleware(
     AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry registry
-  ){
+  ) {
     registry.requestMatchers("/api/resources/**").permitAll();
     registry.anyRequest().hasRole("ADMIN");
   }

@@ -1,8 +1,10 @@
 package com.sass.erp.finance.cash.api_service.services.impl;
 
+import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;
+import com.sass.erp.finance.cash.api_service.services.AdvancedSearchService;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
@@ -10,6 +12,7 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.beans.FeatureDescriptor;
@@ -24,6 +27,20 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
    * The repository instance.
    */
   protected BaseRepository<T, ID> repository;
+
+  /**
+   * The search service instance.
+   */
+  protected AdvancedSearchService<T, ID> searchService;
+
+  @Override
+  public Page<T> search(AdvanceSearchRequest request, Pageable pageable) {
+    return searchService.search(
+      this.repository,
+      request,
+      pageable
+    );
+  }
 
   /**
    * Fetch all entities.
