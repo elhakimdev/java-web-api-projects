@@ -5,10 +5,27 @@ import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedI
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/resources/users")
 public class UserControllerImpl extends RestfullApiControllerImpl<UserEntity, EmbeddedIdentifier> {
   public String getResourceName() {
     return "user";
+  }
+
+  @Override
+  protected List<String> getFilterableBy() {
+    return List.of();
+  }
+
+  @Override
+  protected List<String> getSearchableBy() {
+    return List.of();
+  }
+
+  @Override
+  protected List<String> getSortableBy() {
+    return List.of();
   }
 }

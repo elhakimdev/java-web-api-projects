@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sass.erp.finance.cash.api_service.annotations.SensitiveInformation;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.relationship.UserHasRolesEntity;
 import jakarta.persistence.*;
@@ -22,6 +23,7 @@ public class UserEntity extends BaseEntity {
   @Column(name = "user_email", nullable = false)
   private String userEmail;
 
+  @SensitiveInformation
   @Column(name = "user_password", nullable = false)
   private String userPassword;
 

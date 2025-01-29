@@ -18,10 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class RestfullApiControllerImpl<
+public abstract class RestfullApiControllerImpl<
   T extends BaseEntity,
   ID extends EmbeddedIdentifier
 > extends ControllerImpl implements RestfullApiController<T> {
@@ -38,6 +39,15 @@ public class RestfullApiControllerImpl<
   public String getResourceCollectionsName() {
     return this.getResourceName() + "'s";
   }
+
+  // Abstract method for defining filterable fields
+  protected abstract List<String> getFilterableBy();
+
+  // Abstract method for defining searchable fields
+  protected abstract List<String> getSearchableBy();
+
+  // Abstract method for defining sortable fields
+  protected abstract List<String> getSortableBy();
 
   @GetMapping
   @Override
@@ -73,6 +83,16 @@ public class RestfullApiControllerImpl<
   public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> search(
     @RequestBody AdvanceSearchRequest request, Pageable pageable
   ) {
+
+    // Define the default constraints for filtering, searching, and sorting
+    List<String> filterableBy = getFilterableBy();
+    List<String> searchableBy = getSearchableBy();
+    List<String> sortableBy = getSortableBy();
+
+    // Pass the constraints into the request before processing
+    request.setFilterableBy(filterableBy);
+    request.setSearchableBy(searchableBy);
+    request.setSortableBy(sortableBy);
 
     Page<T> page = this.service.search(request, pageable);
 

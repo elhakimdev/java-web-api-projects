@@ -62,7 +62,14 @@ management:
 
 logging:
   level:
-    org.hibernate.type.descriptor.sql: TRACE
+    org:
+      hibernate:
+        SQL:
+          descriptor:
+            sql=TRACE:
+        type:
+          descriptor:
+            sql=TRACE:
 
 hibernate:
   transaction:

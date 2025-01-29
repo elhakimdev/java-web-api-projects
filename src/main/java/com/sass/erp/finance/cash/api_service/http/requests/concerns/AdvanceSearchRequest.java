@@ -12,6 +12,11 @@ public class AdvanceSearchRequest {
   private List<Sort> sort;
   private List<Aggregate> aggregates;
   private List<Include> includes;
+  private List<String> alwaysIncludes;
+
+  private List<String> filterableBy;
+  private List<String> searchableBy;
+  private List<String> sortableBy;
 
   @Data
   public static class Scope {
