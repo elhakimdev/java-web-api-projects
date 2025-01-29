@@ -6,6 +6,8 @@ import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
+import com.sass.erp.finance.cash.api_service.models.entities.EntityFactoryManager;
+import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.AbstractMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class RestfullApiControllerImpl<
   T extends BaseEntity,
@@ -83,16 +83,10 @@ public abstract class RestfullApiControllerImpl<
   public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> search(
     @RequestBody AdvanceSearchRequest request, Pageable pageable
   ) {
-
-    // Define the default constraints for filtering, searching, and sorting
-    List<String> filterableBy = getFilterableBy();
-    List<String> searchableBy = getSearchableBy();
-    List<String> sortableBy = getSortableBy();
-
-    // Pass the constraints into the request before processing
-    request.setFilterableBy(filterableBy);
-    request.setSearchableBy(searchableBy);
-    request.setSortableBy(sortableBy);
+    // Simply pass the constraints into the request before processing
+    request.setFilterableBy(getFilterableBy());
+    request.setSearchableBy(getSearchableBy());
+    request.setSortableBy(getSortableBy());
 
     Page<T> page = this.service.search(request, pageable);
 
@@ -101,5 +95,17 @@ public abstract class RestfullApiControllerImpl<
     RestfullApiResponse<Map<String, Object>, Object> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "Search result of " + this.getResourceCollectionsName(), HttpStatus.OK);
 
     return ResponseEntity.status(response.getStatusCode()).body(response);
+  }
+
+  @PostMapping("/create")
+  public void store() throws Exception {
+
+    HashMap<String, Object> hashMap = new HashMap<>();
+
+    EntityFactoryManager.create(UserEntity.class, hashMap, (payload, entity) -> {
+      entity.setUserUsername("hakim");
+      entity.setUserPassword("shhhhhhhhhhhhhh");
+      entity.setUserEmail("nooonononon");
+    });
   }
 }
