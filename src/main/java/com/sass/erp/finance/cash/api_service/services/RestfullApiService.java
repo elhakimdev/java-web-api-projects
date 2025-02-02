@@ -1,6 +1,6 @@
 package com.sass.erp.finance.cash.api_service.services;
 
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;

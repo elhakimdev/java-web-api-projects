@@ -1,7 +1,7 @@
 package com.sass.erp.finance.cash.api_service.models.specifications;
 
 import com.sass.erp.finance.cash.api_service.annotations.SensitiveInformation;
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

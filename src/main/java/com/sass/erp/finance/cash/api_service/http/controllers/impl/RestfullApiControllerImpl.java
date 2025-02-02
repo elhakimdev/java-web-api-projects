@@ -1,13 +1,12 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl;
 
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.Request;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
-import com.sass.erp.finance.cash.api_service.models.entities.EntityFactoryManager;
-import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +17,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-
 public abstract class RestfullApiControllerImpl<
   T extends BaseEntity,
   ID extends EmbeddedIdentifier
-> extends ControllerImpl implements RestfullApiController<T> {
+  > extends ControllerImpl implements RestfullApiController<T> {
   @Autowired
   protected RestfullApiService<T, ID> service;
 
@@ -98,14 +94,10 @@ public abstract class RestfullApiControllerImpl<
   }
 
   @PostMapping("/create")
-  public void store() throws Exception {
-
-    HashMap<String, Object> hashMap = new HashMap<>();
-
-    EntityFactoryManager.create(UserEntity.class, hashMap, (payload, entity) -> {
-      entity.setUserUsername("hakim");
-      entity.setUserPassword("shhhhhhhhhhhhhh");
-      entity.setUserEmail("nooonononon");
-    });
+  @Override
+  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> store(
+    @RequestBody Request request
+  ) {
+    return null;
   }
 }

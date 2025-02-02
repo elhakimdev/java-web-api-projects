@@ -30,19 +30,23 @@
 		<java.version>22</java.version>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>com.oracle.database.spring</groupId>
 			<artifactId>oracle-spring-boot-starter-ucp</artifactId>
 			<version>23.4.0</version>
 		</dependency>
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -105,6 +109,8 @@
 			<artifactId>datafaker</artifactId>
 			<version>2.4.2</version>
 		</dependency>
+
+		<!-- Jetbrains -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -112,7 +118,18 @@
             <scope>compile</scope>
         </dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.0</version>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>

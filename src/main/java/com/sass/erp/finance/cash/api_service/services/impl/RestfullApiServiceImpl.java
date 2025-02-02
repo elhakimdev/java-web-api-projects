@@ -1,6 +1,6 @@
 package com.sass.erp.finance.cash.api_service.services.impl;
 
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.models.repositories.BaseRepository;

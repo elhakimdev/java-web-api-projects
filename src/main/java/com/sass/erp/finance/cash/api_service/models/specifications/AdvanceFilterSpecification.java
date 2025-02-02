@@ -1,7 +1,7 @@
 package com.sass.erp.finance.cash.api_service.models.specifications;
 
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.AdvanceSearchRequest;
-import com.sass.erp.finance.cash.api_service.http.requests.concerns.FilterOperatorRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.FilterOperatorRequest;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;

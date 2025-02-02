@@ -1,4 +1,4 @@
-package com.sass.erp.finance.cash.api_service.http.requests.concerns;
+package com.sass.erp.finance.cash.api_service.http.requests.impl.concerns;
 
 public enum FilterOperatorRequest {
   LESS_THAN("<"),
