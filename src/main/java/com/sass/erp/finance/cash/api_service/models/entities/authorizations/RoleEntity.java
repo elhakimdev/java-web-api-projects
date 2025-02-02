@@ -18,15 +18,15 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "CASH_AUTHORIZATION_ROLES")
 public class RoleEntity extends BaseEntity {
-  @Column(name = "role_name", nullable = false)
-  private String roleName;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-  @Column(name = "role_description", nullable = false)
-  private String roleDescription;
+  @Column(name = "description", nullable = false)
+  private String description;
 
-  @Column(name = "role_guard_name", nullable = false)
-  private String roleGuardName;
+  @Column(name = "guard_name", nullable = false)
+  private String guardName;
 
   @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<UserHasRolesEntity> userRoles = new HashSet<>();
+  private Set<UserHasRolesEntity> users = new HashSet<>();
 }

@@ -44,15 +44,15 @@ public class UserFactory extends BaseFactory<UserEntity> {
 
     String username = generalCode + sequenceCode + date + time;
 
-    entity.setUserUsername(username);
-    entity.setUserEmail(username + "@service.com");
-    entity.setUserPassword(encodedPass);
-    entity.setUserIsActive(false);
-    entity.setUserIsMigrated(false);
-    entity.setUserIsVerified(false);
-    entity.setUserIsLocked(false);
-    entity.setUserIsExternal(false);
-    entity.setUserEmailVerifiedAt(LocalDateTime.now());
+    entity.setUsername(username);
+    entity.setEmail(username + "@service.com");
+    entity.setPassword(encodedPass);
+    entity.setIsActive(false);
+    entity.setIsMigrated(false);
+    entity.setIsVerified(false);
+    entity.setIsLocked(false);
+    entity.setIsExternal(false);
+    entity.setEmailVerifiedAt(LocalDateTime.now());
     return entity;
   }
 
@@ -67,10 +67,10 @@ public class UserFactory extends BaseFactory<UserEntity> {
 
   public UserFactory verifiedUser(){
     return (UserFactory) this.state(user -> {
-      user.setUserUsername("KC_MT01VERIFIED");
-      user.setUserEmail("KC_MT01VERIFIED@service.com");
-      user.setUserPassword("PASSKIT01VERIFIED");
-      user.setUserIsVerified(true);
+      user.setUsername("KC_MT01VERIFIED");
+      user.setEmail("KC_MT01VERIFIED@service.com");
+      user.setPassword("PASSKIT01VERIFIED");
+      user.setIsVerified(true);
     });
   }
 }

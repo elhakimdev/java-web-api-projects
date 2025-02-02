@@ -18,14 +18,14 @@ public class UserResource extends Resource<UserEntity> {
     resourceMap.put(String.valueOf(UserResourceField.EXTERNAL_REF_ID), this.entity.getExternalIdentifier().getExternalId());
     resourceMap.put(String.valueOf(UserResourceField.SYSTEM_REF_ID), this.entity.getExternalIdentifier().getSystemRefId());
     resourceMap.put(String.valueOf(UserResourceField.DISPLAY_REF_ID), this.entity.getExternalIdentifier().getDisplayId());
-    resourceMap.put(String.valueOf(UserResourceField.USERNAME), this.entity.getUserUsername());
-    resourceMap.put(String.valueOf(UserResourceField.EMAIL), this.entity.getUserEmail());
-    resourceMap.put(String.valueOf(UserResourceField.IS_ACTIVE), this.entity.getUserIsActive());
-    resourceMap.put(String.valueOf(UserResourceField.LAST_LOGIN_AT), this.entity.getUserLastLoginAt());
-    resourceMap.put(String.valueOf(UserResourceField.EMAIL_VERIFIED_AT), this.entity.getUserEmailVerifiedAt());
-    resourceMap.put(String.valueOf(UserResourceField.IS_LOCKED), this.entity.getUserIsLocked());
-    resourceMap.put(String.valueOf(UserResourceField.IS_VERIFIED), this.entity.getUserIsVerified());
-    resourceMap.put(String.valueOf(UserResourceField.ROLES), this.entity.getUserRoles());
+    resourceMap.put(String.valueOf(UserResourceField.USERNAME), this.entity.getUsername());
+    resourceMap.put(String.valueOf(UserResourceField.EMAIL), this.entity.getEmail());
+    resourceMap.put(String.valueOf(UserResourceField.IS_ACTIVE), this.entity.getIsActive());
+    resourceMap.put(String.valueOf(UserResourceField.LAST_LOGIN_AT), this.entity.getLastLoginAt());
+    resourceMap.put(String.valueOf(UserResourceField.EMAIL_VERIFIED_AT), this.entity.getEmailVerifiedAt());
+    resourceMap.put(String.valueOf(UserResourceField.IS_LOCKED), this.entity.getIsLocked());
+    resourceMap.put(String.valueOf(UserResourceField.IS_VERIFIED), this.entity.getIsVerified());
+    resourceMap.put(String.valueOf(UserResourceField.ROLES), this.entity.getRoles());
     resourceMap.put(String.valueOf(UserResourceField.CREATED_AT), this.entity.getTimeStamp().getCreatedAt());
     resourceMap.put(String.valueOf(UserResourceField.CREATED_BY), this.entity.getAuditLog().getCreatedBy());
     resourceMap.put(String.valueOf(UserResourceField.UPDATED_AT), this.entity.getTimeStamp().getUpdatedAt());
@@ -44,8 +44,8 @@ public class UserResource extends Resource<UserEntity> {
 
     resourceCollectionMap.put(String.valueOf(UserResourceField.ID), this.entity.getIdentifier().getUuid());
     resourceCollectionMap.put(String.valueOf(UserResourceField.DISPLAY_REF_ID), this.entity.getExternalIdentifier().getDisplayId());
-    resourceCollectionMap.put(String.valueOf(UserResourceField.USERNAME), this.entity.getUserUsername());
-    resourceCollectionMap.put(String.valueOf(UserResourceField.EMAIL), this.entity.getUserEmail());
+    resourceCollectionMap.put(String.valueOf(UserResourceField.USERNAME), this.entity.getUsername());
+    resourceCollectionMap.put(String.valueOf(UserResourceField.EMAIL), this.entity.getEmail());
 
     return resourceCollectionMap;
   }

@@ -21,11 +21,24 @@ public class UserControllerImpl extends RestfullApiControllerImpl<UserEntity, Em
 
   @Override
   protected List<String> getSearchableBy() {
-    return List.of();
+    return List.of("email", "name");
   }
 
   @Override
   protected List<String> getSortableBy() {
-    return List.of();
+    return List.of("email", "name");
+  }
+  
+  @Override
+  protected Class<UserEntity> getEntityClass() {
+    return UserEntity.class;
+  }
+
+  @Override
+  protected UserEntity beforeStore(UserEntity entity) {
+    String originalPassword = entity.getPassword();
+    String encodedPassword = this.encoder.encode(originalPassword);
+    entity.setPassword(encodedPassword);
+    return entity;
   }
 }

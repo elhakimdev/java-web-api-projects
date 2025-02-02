@@ -2,50 +2,40 @@ package com.sass.erp.finance.cash.api_service.models.entities;
 
 import com.sass.erp.finance.cash.api_service.annotations.Fillable;
 import com.sass.erp.finance.cash.api_service.annotations.Guarded;
+import com.sass.erp.finance.cash.api_service.http.requests.Request;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedAuditLog;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedExternalID;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedTimeStamp;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+@Slf4j
 public class EntityFactoryManager {
-  public static <T extends BaseEntity, Payload extends Map<String, Object>> T create(Class<T> clazz, Payload payload) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
-    return EntityFactoryManager.create(clazz, payload, null);
+  public static <T extends BaseEntity, Req extends Request> T create(Class<T> clazz, Req request) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+    return EntityFactoryManager.create(clazz, request, null);
   }
 
-  public static <T extends BaseEntity, Payload extends Map<String, Object>> T create(Class<T> clazz, Payload payload, BiConsumer<Payload, T> mapFunc) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+  public static <T extends BaseEntity, Req extends Request> T create(Class<T> clazz, Req request, BiConsumer<Req, T> mapFunc) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+    // Getting entity instance.
     T entity = clazz.getDeclaredConstructor().newInstance();
+
     if(mapFunc != null) {
-      mapFunc.accept(payload, entity);  // Now mapFunc can modify the entity directly
+      mapFunc.accept(request, entity);  // Now mapFunc can modify the entity directly
 
       // Optionally, after manual mapping, copy the fields from the new entity to the current instance
       // TODO : copyFields(entity);  // Copy the updated fields to the original entity
     } else {
-      // Default auto-mapping using reflection
-      for (Field field : entity.getClass().getDeclaredFields()) {
-        field.setAccessible(true);
-
-        // Skip if the field is guarded
-        if (field.isAnnotationPresent(Guarded.class)) {
-          continue;
-        }
-
-        // If the field is fillable, set its value
-        if (field.isAnnotationPresent(Fillable.class)) {
-          if (payload.containsKey(field.getName())) {
-            field.set(entity, payload.get(field.getName()));
-          }
-        }
-      }
+      fillAttributes(entity, request);
     }
-
 
     EntityFactoryManager.prePersistId(entity);
     EntityFactoryManager.prePersistTimestamp(entity);
@@ -53,6 +43,37 @@ public class EntityFactoryManager {
 
     return entity;
   }
+
+  protected static <T extends BaseEntity, Req extends Request> void fillAttributes(T entity, Req request) {
+    // Default auto-mapping using reflection
+    for (Field field : entity.getClass().getDeclaredFields()) {
+      field.setAccessible(true);
+
+      // Skip if the field is guarded
+      if (field.isAnnotationPresent(Guarded.class)) {
+        continue;
+      }
+
+      // If the field is fillable, set its value
+      if (field.isAnnotationPresent(Fillable.class)) {
+
+        Field[] requestFields = request.getClass().getDeclaredFields();
+
+        // Stream iterate over request field and set into entity
+        Arrays.stream(requestFields).forEach((reqField) -> {
+          reqField.setAccessible(true);
+          if (reqField.getName().equals(field.getName())) {
+            try {
+              field.set(entity, reqField.get(request));
+            } catch (IllegalAccessException e) {
+              throw new RuntimeException(e);
+            }
+          }
+        });
+      }
+    }
+  }
+
 
   protected static <T extends BaseEntity> void prePersistId(T entity) {
     // TODO Some check need performed to check id and external id was define or not.

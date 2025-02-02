@@ -38,4 +38,12 @@ public class RoleControllerImpl extends RestfullApiControllerImpl<RoleEntity, Em
   protected List<String> getSortableBy() {
     return List.of();
   }
+
+  /**
+   * @return
+   */
+  @Override
+  protected Class<RoleEntity> getEntityClass() {
+    return RoleEntity.class;
+  }
 }

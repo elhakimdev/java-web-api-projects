@@ -8,4 +8,7 @@ import lombok.Setter;
 @Setter
 @JsonTypeName("roleRequest")
 public class RoleRequestImpl extends RequestImpl {
+  private String name;
+  private String description;
+  private String guardName;
 }

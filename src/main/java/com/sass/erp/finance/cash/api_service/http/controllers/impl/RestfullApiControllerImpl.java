@@ -7,6 +7,7 @@ import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
+import com.sass.erp.finance.cash.api_service.models.entities.EntityFactoryManager;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +17,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 public abstract class RestfullApiControllerImpl<
   T extends BaseEntity,
   ID extends EmbeddedIdentifier
   > extends ControllerImpl implements RestfullApiController<T> {
+
   @Autowired
   protected RestfullApiService<T, ID> service;
 
   @Autowired
   protected Resource<T> resource;
+
+  @Autowired
+  protected BCryptPasswordEncoder encoder;
 
   public String getResourceName() {
     return "data";
@@ -45,6 +53,25 @@ public abstract class RestfullApiControllerImpl<
   // Abstract method for defining sortable fields
   protected abstract List<String> getSortableBy();
 
+  // Abstract method for defining entity class
+  protected abstract Class<T> getEntityClass();
+
+  protected T beforeStore(T entity) {
+    return entity;
+  }
+
+  protected T afterStore(T entity) {
+    return entity;
+  }
+
+  protected T beforeUpdate(T entity) {
+    return entity;
+  }
+
+  protected T afterUpdate(T entity) {
+    return entity;
+  }
+
   @GetMapping
   @Override
   public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> index(
@@ -52,7 +79,9 @@ public abstract class RestfullApiControllerImpl<
     @RequestParam(defaultValue = "10") int size
   ) {
 
-    Page<T> pageable = this.service.findAll(PageRequest.of(page, size));
+    Page<T> pageable = this.service.findAll(PageRequest.of(page - 1, size));
+
+    logger.info("{}", pageable.toString());
 
     Map<String, Object> paginatedCollectionsResponse = this.resource.toPaginatedCollectionsResponse(pageable, this.request);
 
@@ -69,7 +98,7 @@ public abstract class RestfullApiControllerImpl<
     EmbeddedIdentifier embeddedIdentifier = new EmbeddedIdentifier(UUID.fromString(uuid));
     T byIdentifier = this.service.findByIdentifier(embeddedIdentifier);
 
-    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceCollectionsName(), HttpStatus.OK);
+    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceName(), HttpStatus.OK);
 
     return ResponseEntity.status(response.getStatusCode()).body(response);
   }
@@ -97,7 +126,21 @@ public abstract class RestfullApiControllerImpl<
   @Override
   public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> store(
     @RequestBody Request request
-  ) {
-    return null;
+  ) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    // Create entity using factory manager to automatically map request into entity;
+    T entity = EntityFactoryManager.create(getEntityClass(), request);
+
+    // Run before save entity hooks;
+    T beforeStore = this.beforeStore(entity);
+
+    // Save ne entity;
+    T saved = this.service.save(beforeStore);
+
+    // Run after save entity hooks;
+    this.beforeStore(entity);
+
+    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(saved), "Success saving new " + this.getResourceName(), HttpStatus.OK);
+
+    return ResponseEntity.status(response.getStatusCode()).body(response);
   }
 }

@@ -44,17 +44,28 @@ public abstract class Resource<T> {
     Map<String, Object> paginatedResponse = new HashMap<>();
     String baseUrl = getBaseUrl(request);
 
-    paginatedResponse.put("total", pageableEntity.getTotalElements());
-    paginatedResponse.put("totalPage", pageableEntity.getTotalElements() / pageableEntity.getSize());
-    paginatedResponse.put("perPage", pageableEntity.getSize());
-    paginatedResponse.put("currentPage", pageableEntity.getNumber() + 1);
-    paginatedResponse.put("lastPage", pageableEntity.getTotalPages() != 0 ? baseUrl + "?page=" + pageableEntity.getTotalPages() + "&size=" + pageableEntity.getSize() : null);
-    paginatedResponse.put("firstPageUrl", baseUrl + "?page=1" + "&size=" + pageableEntity.getSize());
-    paginatedResponse.put("nextPageUrl", pageableEntity.hasNext() ? (baseUrl + "?=page=" + pageableEntity.getNumber() + 2) + "&size=" + pageableEntity.getSize() : null);
-    paginatedResponse.put("prevPageUrl", pageableEntity.hasPrevious() ? baseUrl + "?page=" + pageableEntity.getNumber() + "&size=" + pageableEntity.getSize() : null);
+    long total = pageableEntity.getTotalElements();
+    long totalPage = pageableEntity.getTotalPages();
+    int perPage = pageableEntity.getSize();
+    int currentPage = pageableEntity.getNumber() + 1;
+    String lastPageUrl = pageableEntity.getTotalPages() != 0 ? baseUrl + "?page=" + pageableEntity.getTotalPages() + "&size=" + pageableEntity.getSize() : null;
+    String firstPageUrl = baseUrl + "?page=1" + "&size=" + pageableEntity.getSize();
+    String nextPageUrl = pageableEntity.hasNext() ? (baseUrl + "?=page=" + pageableEntity.getNumber() + 2) + "&size=" + pageableEntity.getSize() : null;
+    String previousPageUrl = pageableEntity.hasPrevious() ? baseUrl + "?page=" + pageableEntity.getNumber() + "&size=" + pageableEntity.getSize() : null;
+    int from = pageableEntity.getNumber() * pageableEntity.getSize() + 1;
+    int to = (pageableEntity.getNumber() + 1) * pageableEntity.getSize();
+
+    paginatedResponse.put("total", total);
+    paginatedResponse.put("totalPage", totalPage);
+    paginatedResponse.put("perPage", perPage);
+    paginatedResponse.put("currentPage", currentPage);
+    paginatedResponse.put("lastPageUrl", lastPageUrl);
+    paginatedResponse.put("firstPageUrl", firstPageUrl);
+    paginatedResponse.put("nextPageUrl", nextPageUrl);
+    paginatedResponse.put("prevPageUrl", previousPageUrl);
     paginatedResponse.put("path", baseUrl);
-    paginatedResponse.put("from", pageableEntity.getNumber() * pageableEntity.getSize() + 1);
-    paginatedResponse.put("to", (pageableEntity.getNumber() + 1) * pageableEntity.getSize());
+    paginatedResponse.put("from", from);
+    paginatedResponse.put("to", to);
     paginatedResponse.put("entities", entities);
 
     return paginatedResponse;
