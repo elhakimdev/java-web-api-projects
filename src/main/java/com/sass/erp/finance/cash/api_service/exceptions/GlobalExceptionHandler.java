@@ -1,36 +1,35 @@
 package com.sass.erp.finance.cash.api_service.exceptions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-  /**
-   * Logger instance.
-   */
-  protected Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
   /**
    * Exception to http status maps.
    */
   private static final Map<Class<? extends Exception>, HttpStatus> exceptionStatusMapping = new HashMap<>();
+
+  private static final Map<Class<? extends Exception>, String> exceptionCodeMapping = new HashMap<>();
 
   /**
    * Render exception as json response
@@ -41,19 +40,21 @@ public class GlobalExceptionHandler {
    */
   protected ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> renderException(
     Exception exception,
+    List<Object> details,
     HttpStatus httpStatus
   ) {
 
     String traceLogId = UUID.randomUUID().toString();
-
-    logger.error("TraceLogID: {}, Exception caught: {}", traceLogId, exception.getMessage(), exception);
+    String code = exceptionCodeMapping.get(exception.getClass());
+    log.error("TraceLogID: {}, Exception message: {}", traceLogId, exception.getMessage());
 
     RestfullApiResponse<ObjectUtils.Null, BaseException> response = RestfullApiResponseFactory.failed(
       exception,
       exception.getMessage(),
-      "0000X00000",
+      code,
       traceLogId,
-      httpStatus
+      httpStatus,
+      details
     );
 
     return ResponseEntity
@@ -61,31 +62,41 @@ public class GlobalExceptionHandler {
       .body(response);
   }
 
-  /**
-   * General Exception Handler.
-   * Handle all exception and return json response.
-   *
-   * @param exception Exception class
-   */
-  @ExceptionHandler(Exception.class)
-  protected ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleGenericException(Exception exception) {
+  protected
 
-    HttpStatus httpStatus = exceptionStatusMapping.getOrDefault(
-      exception.getClass(),
-      HttpStatus.INTERNAL_SERVER_ERROR
-    );
-
-    return this.renderException(
-      exception,
-      httpStatus
-    );
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleHttpMessageNotReadableException(HttpServletRequest req, HttpMessageNotReadableException ex) {
+    return this.renderException(ex, List.of(), exceptionStatusMapping.get(HttpMessageNotReadableException.class));
   }
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleHttpMessageNotReadableException(HttpServletRequest req, IllegalArgumentException ex) {
+    return this.renderException(ex, List.of(), exceptionStatusMapping.get(IllegalArgumentException.class));
+  }
+
+  @ExceptionHandler(EntityNotFoundException.class)
+  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleEntityNotFoundException(HttpServletRequest req, EntityNotFoundException ex) {
+    return this.renderException(ex, List.of(), exceptionStatusMapping.get(EntityNotFoundException.class));
+  }
+
+
   static {
-    exceptionStatusMapping.put(IllegalArgumentException.class, HttpStatus.INTERNAL_SERVER_ERROR);
+    exceptionStatusMapping.put(HttpMessageNotReadableException.class, HttpStatus.BAD_REQUEST);
+    exceptionStatusMapping.put(JsonProcessingException.class, HttpStatus.BAD_REQUEST);
+    exceptionStatusMapping.put(IllegalArgumentException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(ConstraintViolationException.class, HttpStatus.UNPROCESSABLE_ENTITY);
     exceptionStatusMapping.put(NoResourceFoundException.class, HttpStatus.NOT_FOUND);
     exceptionStatusMapping.put(NoHandlerFoundException.class, HttpStatus.NOT_FOUND);
     exceptionStatusMapping.put(EntityNotFoundException.class, HttpStatus.NOT_FOUND);
+  }
+
+  static {
+    exceptionCodeMapping.put(HttpMessageNotReadableException.class, "");
+    exceptionCodeMapping.put(JsonProcessingException.class, "");
+    exceptionCodeMapping.put(IllegalArgumentException.class, "");
+    exceptionCodeMapping.put(ConstraintViolationException.class, "");
+    exceptionCodeMapping.put(NoResourceFoundException.class, "No_Resource_Found_Exception");
+    exceptionCodeMapping.put(NoHandlerFoundException.class, "No_Handler_Found_Exception");
+    exceptionCodeMapping.put(EntityNotFoundException.class, "Entity_Not_Found_Exception");
   }
 }

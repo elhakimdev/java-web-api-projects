@@ -1,6 +1,7 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl.resources.role;
 
 import com.sass.erp.finance.cash.api_service.http.controllers.impl.RestfullApiControllerImpl;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.RoleRequestImpl;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.RoleEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,5 +46,13 @@ public class RoleControllerImpl extends RestfullApiControllerImpl<RoleEntity, Em
   @Override
   protected Class<RoleEntity> getEntityClass() {
     return RoleEntity.class;
+  }
+
+  /**
+   * @return
+   */
+  @Override
+  protected Class<RoleRequestImpl> getRequestClass() {
+    return RoleRequestImpl.class;
   }
 }

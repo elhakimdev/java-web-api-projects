@@ -5,9 +5,13 @@ import lombok.*;
 
 @Getter
 @Setter
-@JsonTypeName("userRequest")
 public class UserRequestImpl extends RequestImpl {
   private String username;
   private String email;
   private String password;
+
+  @Override
+  protected boolean authorize() {
+    return false;
+  }
 }

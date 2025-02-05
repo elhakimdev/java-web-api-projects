@@ -1,7 +1,11 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
 import com.sass.erp.finance.cash.api_service.http.requests.Request;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.RequestImpl;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
@@ -10,6 +14,7 @@ import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.EntityFactoryManager;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,9 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 public abstract class RestfullApiControllerImpl<
@@ -35,6 +42,12 @@ public abstract class RestfullApiControllerImpl<
 
   @Autowired
   protected BCryptPasswordEncoder encoder;
+
+  @Autowired
+  protected ModelMapper mapper;
+
+  @Autowired
+  protected ObjectMapper objectMapper;
 
   public String getResourceName() {
     return "data";
@@ -55,6 +68,8 @@ public abstract class RestfullApiControllerImpl<
 
   // Abstract method for defining entity class
   protected abstract Class<T> getEntityClass();
+
+  protected abstract Class<?> getRequestClass();
 
   // Hook will be fired before saved entity persisted into db;
   protected T beforeStore(T entity) {
@@ -141,20 +156,25 @@ public abstract class RestfullApiControllerImpl<
   @PostMapping("/create")
   @Override
   public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> store(
-    @RequestBody Request request
-  ) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    @RequestBody Object request
+  ) throws IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+
+    logger.info("{}", request);
+
+    Request req  = (Request) this.objectMapper.convertValue(request, getRequestClass());
+
+    logger.info("Request: {}", req);
+
     // Create entity using factory manager to automatically map request into entity;
-    T entity = EntityFactoryManager.create(getEntityClass(), request);
+    T entity = EntityFactoryManager.create(getEntityClass(), req);
 
     // Run before save entity hooks;
     T beforeStore = this.beforeStore(entity);
 
-    // Save a new entity;
     T saved = this.service.save(beforeStore);
 
     // Run after save entity hooks;
     this.beforeStore(entity);
-
     // Transform to json response as a resources;
     RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(saved), "Success saving new " + this.getResourceName(), HttpStatus.OK);
 

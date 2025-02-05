@@ -1,5 +1,7 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl.resources.user;
 import com.sass.erp.finance.cash.api_service.http.controllers.impl.RestfullApiControllerImpl;
+import com.sass.erp.finance.cash.api_service.http.requests.Request;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.UserRequestImpl;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,11 @@ public class UserControllerImpl extends RestfullApiControllerImpl<UserEntity, Em
   @Override
   protected Class<UserEntity> getEntityClass() {
     return UserEntity.class;
+  }
+
+  @Override
+  protected Class<UserRequestImpl> getRequestClass() {
+    return UserRequestImpl.class;
   }
 
   @Override

@@ -32,17 +32,17 @@ public class RestfullApiResponseFactory {
     String message,
     String code,
     String traceId,
-    HttpStatus httpStatus
+    HttpStatus httpStatus,
+    List<Object> details
   ) {
     RestfullApiResponse<T, E> errorResponse = new RestfullApiResponse<T, E>() {
     };
 
     RestfullApiResponseError<E> errorMapping = new RestfullApiResponseError<E>(
-      message,
       error.getClass().getCanonicalName(),
       code,
       traceId,
-      List.of()
+      details
     );
 
     errorResponse.setMessage(message);

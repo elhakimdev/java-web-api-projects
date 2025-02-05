@@ -6,9 +6,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonTypeName("roleRequest")
 public class RoleRequestImpl extends RequestImpl {
   private String name;
   private String description;
   private String guardName;
+
+  @Override
+  protected boolean authorize() {
+    return true;
+  }
 }
