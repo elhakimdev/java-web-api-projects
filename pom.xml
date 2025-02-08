@@ -142,6 +142,18 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.18.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

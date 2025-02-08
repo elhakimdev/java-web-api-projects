@@ -40,9 +40,9 @@ public class RestfullApiResponseFactory {
     if (exception instanceof ApplicationException appException) {
       appExceptionErrorResponse = appException.toResponse(traceId);
     } else if (exception instanceof RuntimeException) {
-      appGenericErrorResponse = new RestfullApiResponseError<>("RUNTIME_EXCEPTION", traceId, details);
+      appGenericErrorResponse = new RestfullApiResponseError<>("RUNTIME_EXCEPTION", "0x000", traceId, details);
     } else {
-      appGenericErrorResponse = new RestfullApiResponseError<>("UNKNOWN_EXCEPTION", traceId, details);
+      appGenericErrorResponse = new RestfullApiResponseError<>("UNKNOWN_EXCEPTION", "0x000", traceId, details);
     }
 
     errorResponse.setMessage(message);

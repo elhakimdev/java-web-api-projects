@@ -1,11 +1,12 @@
 package com.sass.erp.finance.cash.api_service.exceptions.runtime;
 
-import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionConstant;
+import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionCodeConstant;
+import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionTypeConstant;
 
 import java.util.List;
 
 public class UnauthorizedRequestException extends ApplicationException {
-  UnauthorizedRequestException(String message, ApplicationExceptionConstant type, int code, List<Object> details) {
+  public UnauthorizedRequestException(String message, ApplicationExceptionTypeConstant type, int code, List<Object> details) {
     super(message, type, code, details);
   }
 }

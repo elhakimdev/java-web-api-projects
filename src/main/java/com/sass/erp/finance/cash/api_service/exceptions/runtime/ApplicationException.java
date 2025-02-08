@@ -1,13 +1,16 @@
 package com.sass.erp.finance.cash.api_service.exceptions.runtime;
 
-import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionConstant;
+import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionCodeConstant;
+import com.sass.erp.finance.cash.api_service.exceptions.ApplicationExceptionTypeConstant;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseError;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class ApplicationException extends RuntimeException {
 
-  protected ApplicationExceptionConstant type;
+  protected ApplicationExceptionTypeConstant type;
 
   protected int code;
 
@@ -15,7 +18,7 @@ public class ApplicationException extends RuntimeException {
 
   ApplicationException(
     String message,
-    ApplicationExceptionConstant type,
+    ApplicationExceptionTypeConstant type,
     int code,
     List<Object> details
   ){
@@ -29,6 +32,7 @@ public class ApplicationException extends RuntimeException {
     return new RestfullApiResponseError<>(
       this.type.toString(),
       String.format("0x%04X", this.code),
+      traceId,
       this.details
     );
   }

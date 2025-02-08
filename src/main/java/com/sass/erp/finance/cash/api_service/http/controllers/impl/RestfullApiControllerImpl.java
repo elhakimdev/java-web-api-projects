@@ -159,6 +159,8 @@ public abstract class RestfullApiControllerImpl<
 
     Request req  = (Request) this.objectMapper.convertValue(request, getRequestClass());
 
+    req.validate();
+
     logger.info("Request: {}", req);
 
     // Create entity using factory manager to automatically map request into entity;

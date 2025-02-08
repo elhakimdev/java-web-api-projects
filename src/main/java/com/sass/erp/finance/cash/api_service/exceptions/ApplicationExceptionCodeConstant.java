@@ -1,6 +1,6 @@
 package com.sass.erp.finance.cash.api_service.exceptions;
 
-public class ApplicationExceptionConstant {
+public class ApplicationExceptionCodeConstant {
   // General Validation Errors (0x0001 - 0x0010)
   public static final int CONSTRAINT_VIOLATION= 0x0001;
   public static final int MISSING_REQUIRED_FIELD = 0x0002;
