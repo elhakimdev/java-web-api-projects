@@ -5,6 +5,6 @@ public record RestfullApiResponseError<E>(
   String type,
   String code,
   String traceId,
-  List<Object> details
+  Object details
 ) {
 }

@@ -1,6 +1,7 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sass.erp.finance.cash.api_service.exceptions.runtime.ValidationFailedException;
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
 import com.sass.erp.finance.cash.api_service.http.requests.Request;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
@@ -153,18 +154,20 @@ public abstract class RestfullApiControllerImpl<
   @Override
   public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(
     @RequestBody Object request
-  ) throws IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+  ) throws ValidationFailedException, IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
 
     logger.info("{}", request);
 
     Request req  = (Request) this.objectMapper.convertValue(request, getRequestClass());
 
-    req.validate();
+    logger.info("Request: {}", req.toString());
 
-    logger.info("Request: {}", req);
+    Request validReqs = req.validated();
+
+    logger.info("Request: {}", validReqs.toString());
 
     // Create entity using factory manager to automatically map request into entity;
-    T entity = EntityFactoryManager.create(getEntityClass(), req);
+    T entity = EntityFactoryManager.create(getEntityClass(), validReqs);
 
     // Run before save entity hooks;
     T beforeStore = this.beforeStore(entity);

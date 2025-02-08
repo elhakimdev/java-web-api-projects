@@ -9,6 +9,9 @@ import com.sass.erp.finance.cash.api_service.annotations.SensitiveInformation;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.relationship.UserHasRolesEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 
@@ -21,10 +24,12 @@ import org.hibernate.annotations.Fetch;
 public class UserEntity extends BaseEntity {
   @Fillable
   @Column(name = "username", nullable = false)
+  @NotBlank(message = "Username is required")
+  @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
   private String username;
 
   @Fillable
-  @Column(name = "email", nullable = false)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
   @Fillable

@@ -12,6 +12,7 @@ public class ApplicationExceptionCodeConstant {
   public static final int INVALID_PHONE= 0x0008;
   public static final int INVALID_DATE= 0x0009;
   public static final int INVALID_BOOLEAN= 0x000A;
+  public static final int INVALID_REQUEST=0x000B;
 
   // Authentication Validation Errors (0x0011 - 0x0020)
   public static final int AUTHENTICATION_FAILED= 0x0011;

@@ -3,6 +3,7 @@ package com.sass.erp.finance.cash.api_service.exceptions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sass.erp.finance.cash.api_service.exceptions.runtime.ApplicationException;
 import com.sass.erp.finance.cash.api_service.exceptions.runtime.UnauthorizedRequestException;
+import com.sass.erp.finance.cash.api_service.exceptions.runtime.ValidationFailedException;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import jakarta.persistence.EntityNotFoundException;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(httpStatus).body(failed);
   }
 
+  @ExceptionHandler(ValidationFailedException.class)
+  ResponseEntity<RestfullApiResponse<Object>> handleValidationFailedException(HttpServletRequest req, ValidationFailedException validationFailedException) {
+    log.error("HttpServletRequest Info: {}, ValidationFailedException Details: {}", req, validationFailedException.getDetails());
+    return this.renderException(validationFailedException, List.of(), exceptionStatusMapping.get(ValidationFailedException.class));
+  }
+
+
   @ExceptionHandler(UnauthorizedRequestException.class)
   ResponseEntity<RestfullApiResponse<Object>> handleUnauthorizedRequestException(HttpServletRequest req, UnauthorizedRequestException unauthorizedRequestException) {
     log.error("HttpServletRequest Info: {}, UnauthorizedRequestException Details: {}", req, unauthorizedRequestException.getDetails());
@@ -88,6 +96,7 @@ public class GlobalExceptionHandler {
     exceptionStatusMapping.put(JsonProcessingException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(IllegalArgumentException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(ConstraintViolationException.class, HttpStatus.UNPROCESSABLE_ENTITY);
+    exceptionStatusMapping.put(ValidationFailedException.class, HttpStatus.UNPROCESSABLE_ENTITY);
     exceptionStatusMapping.put(NoResourceFoundException.class, HttpStatus.NOT_FOUND);
     exceptionStatusMapping.put(NoHandlerFoundException.class, HttpStatus.NOT_FOUND);
     exceptionStatusMapping.put(EntityNotFoundException.class, HttpStatus.NOT_FOUND);
