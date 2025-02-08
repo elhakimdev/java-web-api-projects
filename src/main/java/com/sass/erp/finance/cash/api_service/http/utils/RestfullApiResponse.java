@@ -1,5 +1,4 @@
 package com.sass.erp.finance.cash.api_service.http.utils;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +10,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RestfullApiResponse<T, E> {
+public class RestfullApiResponse<T> {
   protected RestfullApiResponseStatus status;
   protected String message;
   protected Integer statusCode;
   protected String statusText;
   protected LocalDateTime timestamp;
   protected T data;
-  protected RestfullApiResponseError<E> error;
+  protected RestfullApiResponseError<? extends Exception> error;
 }

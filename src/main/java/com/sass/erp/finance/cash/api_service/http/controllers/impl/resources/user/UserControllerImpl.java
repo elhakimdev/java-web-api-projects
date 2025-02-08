@@ -1,6 +1,5 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl.resources.user;
 import com.sass.erp.finance.cash.api_service.http.controllers.impl.RestfullApiControllerImpl;
-import com.sass.erp.finance.cash.api_service.http.requests.Request;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.UserRequestImpl;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.UserEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;

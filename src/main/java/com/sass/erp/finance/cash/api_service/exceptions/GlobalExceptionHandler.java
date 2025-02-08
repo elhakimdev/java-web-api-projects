@@ -1,15 +1,13 @@
 package com.sass.erp.finance.cash.api_service.exceptions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sass.erp.finance.cash.api_service.exceptions.runtime.UnauthorizedRequestException;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -38,49 +36,52 @@ public class GlobalExceptionHandler {
    * @param httpStatus The HttpStatus.
    * @return The Json Response.
    */
-  protected ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> renderException(
+  protected ResponseEntity<RestfullApiResponse<Object>> renderException(
     Exception exception,
     List<Object> details,
     HttpStatus httpStatus
   ) {
-
     String traceLogId = UUID.randomUUID().toString();
     String code = exceptionCodeMapping.get(exception.getClass());
-    log.error("TraceLogID: {}, Exception message: {}", traceLogId, exception.getMessage());
+    log.error("TraceLogID: {}, code: {}", traceLogId, code);
 
-    RestfullApiResponse<ObjectUtils.Null, BaseException> response = RestfullApiResponseFactory.failed(
+    RestfullApiResponse<Object> failed = RestfullApiResponseFactory.failed(
       exception,
-      exception.getMessage(),
-      code,
       traceLogId,
+      exception.getMessage(),
       httpStatus,
       details
     );
 
-    return ResponseEntity
-      .status(httpStatus)
-      .body(response);
+    return ResponseEntity.status(httpStatus).body(failed);
   }
 
-  protected
+  ResponseEntity<RestfullApiResponse<Object>> handleUnauthorizedRequestException(HttpServletRequest req, UnauthorizedRequestException unauthorizedRequestException) {
+    log.error("HttpServletRequest Info: {}, UnauthorizedRequestException: ", req, unauthorizedRequestException);
+    return this.renderException(unauthorizedRequestException, List.of(), exceptionStatusMapping.get(UnauthorizedRequestException.class));
+  }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleHttpMessageNotReadableException(HttpServletRequest req, HttpMessageNotReadableException ex) {
-    return this.renderException(ex, List.of(), exceptionStatusMapping.get(HttpMessageNotReadableException.class));
+  ResponseEntity<RestfullApiResponse<Object>> handleHttpMessageNotReadableException(HttpServletRequest req, HttpMessageNotReadableException httpMessageNotReadableException) {
+    log.error("HttpServletRequest Info: {}, HttpMessageNotReadableException: ", req, httpMessageNotReadableException);
+    return this.renderException(httpMessageNotReadableException, List.of(), exceptionStatusMapping.get(HttpMessageNotReadableException.class));
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleHttpMessageNotReadableException(HttpServletRequest req, IllegalArgumentException ex) {
-    return this.renderException(ex, List.of(), exceptionStatusMapping.get(IllegalArgumentException.class));
+  ResponseEntity<RestfullApiResponse<Object>> handleIllegalArgumentException(HttpServletRequest req, IllegalArgumentException illegalArgumentException) {
+    log.error("HttpServletRequest Info: {}, IllegalArgumentException: ", req, illegalArgumentException);
+    return this.renderException(illegalArgumentException, List.of(), exceptionStatusMapping.get(IllegalArgumentException.class));
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
-  ResponseEntity<RestfullApiResponse<ObjectUtils.Null, BaseException>> handleEntityNotFoundException(HttpServletRequest req, EntityNotFoundException ex) {
-    return this.renderException(ex, List.of(), exceptionStatusMapping.get(EntityNotFoundException.class));
+  ResponseEntity<RestfullApiResponse<Object>> handleEntityNotFoundException(HttpServletRequest req, EntityNotFoundException entityNotFoundException) {
+    log.error("HttpServletRequest Info: {}, EntityNotFoundException: ", req, entityNotFoundException);
+    return this.renderException(entityNotFoundException, List.of(), exceptionStatusMapping.get(EntityNotFoundException.class));
   }
 
 
   static {
+    exceptionStatusMapping.put(UnauthorizedRequestException.class, HttpStatus.UNAUTHORIZED);
     exceptionStatusMapping.put(HttpMessageNotReadableException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(JsonProcessingException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(IllegalArgumentException.class, HttpStatus.BAD_REQUEST);

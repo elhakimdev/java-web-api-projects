@@ -1,11 +1,8 @@
 package com.sass.erp.finance.cash.api_service.http.controllers.impl;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
 import com.sass.erp.finance.cash.api_service.http.requests.Request;
-import com.sass.erp.finance.cash.api_service.http.requests.impl.RequestImpl;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
@@ -26,7 +23,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 public abstract class RestfullApiControllerImpl<
@@ -93,7 +89,7 @@ public abstract class RestfullApiControllerImpl<
 
   @GetMapping
   @Override
-  public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> index(
+  public HttpEntity<RestfullApiResponse<Map<String, Object>>> index(
     @RequestParam(defaultValue = "1") int page,
     @RequestParam(defaultValue = "10") int size
   ) {
@@ -106,7 +102,7 @@ public abstract class RestfullApiControllerImpl<
     Map<String, Object> paginatedCollectionsResponse = this.resource.toPaginatedCollectionsResponse(pageable, this.request);
 
     // Transform to json response as a resources.
-    RestfullApiResponse<Map<String, Object>, Object> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "List " + this.getResourceCollectionsName(), HttpStatus.OK);
+    RestfullApiResponse<Map<String, Object>> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "List " + this.getResourceCollectionsName(), HttpStatus.OK);
 
     // Return HTTP Response as json.
     return ResponseEntity.status(response.getStatusCode()).body(response);
@@ -114,7 +110,7 @@ public abstract class RestfullApiControllerImpl<
 
   @GetMapping("/{uuid}")
   @Override
-  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> show(
+  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> show(
     @PathVariable String uuid
   ) {
     // Create and embedded ID instance;
@@ -124,7 +120,7 @@ public abstract class RestfullApiControllerImpl<
     T byIdentifier = this.service.findByIdentifier(embeddedIdentifier);
 
     // Transform to json response as a resource;
-    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceName(), HttpStatus.OK);
+    RestfullApiResponse<AbstractMap<String, Object>> response = RestfullApiResponseFactory.success(this.resource.toResponse(byIdentifier), "Retrieve " + this.getResourceName(), HttpStatus.OK);
 
     // Return HTTP Response as json.
     return ResponseEntity.status(response.getStatusCode()).body(response);
@@ -132,7 +128,7 @@ public abstract class RestfullApiControllerImpl<
 
   @PostMapping("/search")
   @Override
-  public HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> search(
+  public HttpEntity<RestfullApiResponse<Map<String, Object>>> search(
     @RequestBody AdvanceSearchRequest request, Pageable pageable
   ) {
     // Simply pass the constraints into the request before processing
@@ -147,7 +143,7 @@ public abstract class RestfullApiControllerImpl<
     Map<String, Object> paginatedCollectionsResponse = this.resource.toPaginatedCollectionsResponse(page, this.request);
 
     // Transform to json response as a resource collections.
-    RestfullApiResponse<Map<String, Object>, Object> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "Search result of " + this.getResourceCollectionsName(), HttpStatus.OK);
+    RestfullApiResponse<Map<String, Object>> response = RestfullApiResponseFactory.success(paginatedCollectionsResponse, "Search result of " + this.getResourceCollectionsName(), HttpStatus.OK);
 
     // Return HTTP Response as json.
     return ResponseEntity.status(response.getStatusCode()).body(response);
@@ -155,7 +151,7 @@ public abstract class RestfullApiControllerImpl<
 
   @PostMapping("/create")
   @Override
-  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> store(
+  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(
     @RequestBody Object request
   ) throws IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
 
@@ -176,7 +172,7 @@ public abstract class RestfullApiControllerImpl<
     // Run after save entity hooks;
     this.beforeStore(entity);
     // Transform to json response as a resources;
-    RestfullApiResponse<AbstractMap<String, Object>, Object> response = RestfullApiResponseFactory.success(this.resource.toResponse(saved), "Success saving new " + this.getResourceName(), HttpStatus.OK);
+    RestfullApiResponse<AbstractMap<String, Object>> response = RestfullApiResponseFactory.success(this.resource.toResponse(saved), "Success saving new " + this.getResourceName(), HttpStatus.OK);
 
     // Return HTTP Response as json.
     return ResponseEntity.status(response.getStatusCode()).body(response);

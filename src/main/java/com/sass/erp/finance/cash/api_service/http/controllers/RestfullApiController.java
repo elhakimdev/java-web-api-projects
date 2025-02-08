@@ -16,8 +16,8 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 public interface RestfullApiController<T extends BaseEntity> {
-  HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> search(AdvanceSearchRequest request, Pageable pageable);
-  HttpEntity<RestfullApiResponse<Map<String, Object>, Object>> index(int page, int size);
-  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> show(String uuid);
-  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>, Object>> store(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException;
+  HttpEntity<RestfullApiResponse<Map<String, Object>>> search(AdvanceSearchRequest request, Pageable pageable);
+  HttpEntity<RestfullApiResponse<Map<String, Object>>> index(int page, int size);
+  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> show(String uuid);
+  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException;
 }

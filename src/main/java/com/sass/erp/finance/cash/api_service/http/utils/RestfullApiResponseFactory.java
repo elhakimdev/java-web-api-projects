@@ -1,20 +1,18 @@
 package com.sass.erp.finance.cash.api_service.http.utils;
 
-import com.sass.erp.finance.cash.api_service.exceptions.BaseException;
-import org.apache.commons.lang3.ObjectUtils;
+import com.sass.erp.finance.cash.api_service.exceptions.runtime.ApplicationException;
 import org.springframework.http.HttpStatus;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public class RestfullApiResponseFactory {
-  public static <T, E> RestfullApiResponse<T, E> success(
+  public static <T> RestfullApiResponse<T> success(
     T data,
     String message,
     HttpStatus httpStatus
   ) {
 
-    RestfullApiResponse<T, E> successResponse = new RestfullApiResponse<>();
+    RestfullApiResponse<T> successResponse = new RestfullApiResponse<>();
     RestfullApiResponseData<T> responseData = new RestfullApiResponseData<>(data);
 
     successResponse.setMessage(message);
@@ -26,32 +24,35 @@ public class RestfullApiResponseFactory {
     successResponse.setTimestamp(LocalDateTime.now());
     return successResponse;
   }
-
-  public static <T, E extends BaseException> RestfullApiResponse<T, E> failed(
-    Exception error,
-    String message,
-    String code,
+  public static <T, Ex extends Exception> RestfullApiResponse<T> failed(
+    Ex exception,
     String traceId,
+    String message,
     HttpStatus httpStatus,
     List<Object> details
   ) {
-    RestfullApiResponse<T, E> errorResponse = new RestfullApiResponse<T, E>() {
-    };
+    RestfullApiResponse<T> errorResponse = new RestfullApiResponse<>() {};
 
-    RestfullApiResponseError<E> errorMapping = new RestfullApiResponseError<E>(
-      error.getClass().getCanonicalName(),
-      code,
-      traceId,
-      details
-    );
+    RestfullApiResponseError<Ex> appGenericErrorResponse = null;
+
+    RestfullApiResponseError<ApplicationException> appExceptionErrorResponse = null;
+
+    if (exception instanceof ApplicationException appException) {
+      appExceptionErrorResponse = appException.toResponse(traceId);
+    } else if (exception instanceof RuntimeException) {
+      appGenericErrorResponse = new RestfullApiResponseError<>("RUNTIME_EXCEPTION", traceId, details);
+    } else {
+      appGenericErrorResponse = new RestfullApiResponseError<>("UNKNOWN_EXCEPTION", traceId, details);
+    }
 
     errorResponse.setMessage(message);
     errorResponse.setStatus(RestfullApiResponseStatus.FAILED);
     errorResponse.setStatusCode(httpStatus.value());
     errorResponse.setStatusText(httpStatus.getReasonPhrase());
-    errorResponse.setError(errorMapping);
+    errorResponse.setError(exception instanceof ApplicationException ? appExceptionErrorResponse : appGenericErrorResponse);
     errorResponse.setData(null);
     errorResponse.setTimestamp(LocalDateTime.now());
+
     return errorResponse;
   }
 }
