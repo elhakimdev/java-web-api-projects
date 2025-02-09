@@ -9,6 +9,7 @@ import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedT
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @MappedSuperclass
+@ToString
 public abstract class BaseEntity {
 
   public static final String DEFAULT_AUDITOR_FLAG = "System";

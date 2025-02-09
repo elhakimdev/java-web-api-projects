@@ -5,6 +5,7 @@ import com.sass.erp.finance.cash.api_service.http.requests.impl.RequestImpl;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
+import oracle.jdbc.OracleDatabaseException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,5 +20,6 @@ public interface RestfullApiController<T extends BaseEntity> {
   HttpEntity<RestfullApiResponse<Map<String, Object>>> search(AdvanceSearchRequest request, Pageable pageable);
   HttpEntity<RestfullApiResponse<Map<String, Object>>> index(int page, int size);
   HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> show(String uuid);
-  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException;
+  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(Object request) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException, OracleDatabaseException;
+  HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> update(Object request, String uuid) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException;
 }

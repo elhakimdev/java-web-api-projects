@@ -4,16 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sass.erp.finance.cash.api_service.exceptions.runtime.ValidationFailedException;
 import com.sass.erp.finance.cash.api_service.http.controllers.RestfullApiController;
 import com.sass.erp.finance.cash.api_service.http.requests.Request;
+import com.sass.erp.finance.cash.api_service.http.requests.impl.RequestImpl;
 import com.sass.erp.finance.cash.api_service.http.requests.impl.concerns.AdvanceSearchRequest;
 import com.sass.erp.finance.cash.api_service.http.resources.Resource;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponse;
 import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
-import com.sass.erp.finance.cash.api_service.models.entities.EntityFactoryManager;
+import com.sass.erp.finance.cash.api_service.models.entities.EntityManagerFactory;
 import com.sass.erp.finance.cash.api_service.models.entities.embedable.EmbeddedIdentifier;
 import com.sass.erp.finance.cash.api_service.services.RestfullApiService;
+import oracle.jdbc.OracleDatabaseException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -154,32 +157,66 @@ public abstract class RestfullApiControllerImpl<
   @Override
   public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> store(
     @RequestBody Object request
-  ) throws ValidationFailedException, IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
-
-    logger.info("{}", request);
-
+  ) throws OracleDatabaseException, DataIntegrityViolationException, ValidationFailedException, IllegalArgumentException, HttpMessageNotReadableException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    // Map request body to specific entity request instance.
     Request req  = (Request) this.objectMapper.convertValue(request, getRequestClass());
 
-    logger.info("Request: {}", req.toString());
+    // Validate and get the entity request instance with validated fields.
+    Request validatedRequest = req.validated(RequestImpl.Create.class);
 
-    Request validReqs = req.validated();
-
-    logger.info("Request: {}", validReqs.toString());
-
-    // Create entity using factory manager to automatically map request into entity;
-    T entity = EntityFactoryManager.create(getEntityClass(), validReqs);
+    // Create entity using factory manager to automatically map request into entity.
+    T entity = EntityManagerFactory.create(getEntityClass(), validatedRequest);
 
     // Run before save entity hooks;
     T beforeStore = this.beforeStore(entity);
 
+    // Persist entity.
     T saved = this.service.save(beforeStore);
 
-    // Run after save entity hooks;
-    this.beforeStore(entity);
-    // Transform to json response as a resources;
+    // Run after save entity hooks.
+    this.afterStore(entity);
+
+    // Transform to json response as a resources.
     RestfullApiResponse<AbstractMap<String, Object>> response = RestfullApiResponseFactory.success(this.resource.toResponse(saved), "Success saving new " + this.getResourceName(), HttpStatus.OK);
 
     // Return HTTP Response as json.
+    return ResponseEntity.status(response.getStatusCode()).body(response);
+  }
+
+  @PatchMapping("/{uuid}")
+  @Override
+  public HttpEntity<RestfullApiResponse<AbstractMap<String, Object>>> update(
+    @RequestBody Object request,
+    @PathVariable String uuid
+  ) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    // Map request body to specific entity request instance.
+    Request req  = (Request) this.objectMapper.convertValue(request, getRequestClass());
+
+    // Validate and get the entity request instance with validated fields.
+    Request validatedRequest = req.validated(RequestImpl.Update.class);
+
+    // Create and embedded ID instance;
+    EmbeddedIdentifier embeddedIdentifier = new EmbeddedIdentifier(UUID.fromString(uuid));
+
+    // Run find entity
+    T byIdentifier = this.service.findByIdentifier(embeddedIdentifier);
+
+    // Update entity using factory manager to automatically map request into entity.
+    T updatedEntity = com.sass.erp.finance.cash.api_service.models.entities.EntityManagerFactory.update(byIdentifier, validatedRequest);
+
+    // Run before update entity hook.
+    T beforeUpdate = this.beforeUpdate(updatedEntity);
+
+    // Updated then persist entity.
+    T updated = this.service.save(beforeUpdate);
+
+    // Run after update hooks.
+    this.afterUpdate(updated);
+
+    // Build response object.
+    RestfullApiResponse<AbstractMap<String, Object>> response = RestfullApiResponseFactory.success(this.resource.toResponse(updated), "Success updating new " + this.getResourceName(), HttpStatus.OK);
+
+    // Return http response.
     return ResponseEntity.status(response.getStatusCode()).body(response);
   }
 }

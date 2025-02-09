@@ -43,12 +43,12 @@ public interface RestfullApiService<T, ID extends EmbeddedIdentifier> {
   /**
    * Update entity by given identifier with the new entity.
    *
-   * @param id The embedded UUID associated for this entity.
+   * @param embeddedIdentifier The embedded UUID associated for this entity.
    * @param entity The entity.
    * @return Updated entity.
    * @throws EntityNotFoundException Exception thrown where entity not found.
    */
-  T update(ID id, T entity) throws EntityNotFoundException;
+  T update(EmbeddedIdentifier embeddedIdentifier, T entity) throws EntityNotFoundException;
 
   /**
    * Delete entity by given UUID.

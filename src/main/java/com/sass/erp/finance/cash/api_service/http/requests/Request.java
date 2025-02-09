@@ -8,5 +8,7 @@ import java.util.Set;
 
 public interface Request {
   Set<ConstraintViolation<RequestImpl>> validate() throws ValidationFailedException;
+  Set<ConstraintViolation<RequestImpl>> validate(Class<?> ...groups) throws ValidationFailedException;
   <Req extends Request> Req validated();
+  <Req extends Request> Req validated(Class<?> ...groups);
 }

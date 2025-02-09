@@ -9,7 +9,9 @@ import com.sass.erp.finance.cash.api_service.http.utils.RestfullApiResponseFacto
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import oracle.jdbc.OracleDatabaseException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -64,6 +66,18 @@ public class GlobalExceptionHandler {
     return this.renderException(validationFailedException, List.of(), exceptionStatusMapping.get(ValidationFailedException.class));
   }
 
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  ResponseEntity<RestfullApiResponse<Object>> handleDataIntegrityViolationException(HttpServletRequest req, DataIntegrityViolationException dataIntegrityViolationException) {
+    log.error("HttpServletRequest Info: {}, DataIntegrityViolationException: Details: {}", req, dataIntegrityViolationException.toString());
+    return this.renderException(dataIntegrityViolationException, List.of(), exceptionStatusMapping.get(DataIntegrityViolationException.class));
+  }
+
+  @ExceptionHandler(OracleDatabaseException.class)
+  ResponseEntity<RestfullApiResponse<Object>> handleOracleDatabaseException(HttpServletRequest req, OracleDatabaseException oracleDatabaseException) {
+    log.error("HttpServletRequest Info: {}, OracleDatabaseException: Details: {}", req, oracleDatabaseException.toString());
+    return this.renderException(oracleDatabaseException, List.of(), exceptionStatusMapping.get(OracleDatabaseException.class));
+  }
+
 
   @ExceptionHandler(UnauthorizedRequestException.class)
   ResponseEntity<RestfullApiResponse<Object>> handleUnauthorizedRequestException(HttpServletRequest req, UnauthorizedRequestException unauthorizedRequestException) {
@@ -91,6 +105,7 @@ public class GlobalExceptionHandler {
 
 
   static {
+    exceptionStatusMapping.put(OracleDatabaseException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(UnauthorizedRequestException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(HttpMessageNotReadableException.class, HttpStatus.BAD_REQUEST);
     exceptionStatusMapping.put(JsonProcessingException.class, HttpStatus.BAD_REQUEST);

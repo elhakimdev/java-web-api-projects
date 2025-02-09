@@ -73,7 +73,7 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
   public T findByUUID(ID id) throws EntityNotFoundException {
     return Optional
       .ofNullable(repository.findByIdentifier(id))
-      .orElseThrow(() -> new EntityNotFoundException("Entity with id: ["+ id.getUuid().toString() +" ] not found"));
+      .orElseThrow(() -> new EntityNotFoundException("Could not fin entity: ["+ id.getUuid().toString() +"]"));
   }
 
   /**
@@ -87,7 +87,7 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
   public T findByIdentifier(EmbeddedIdentifier embeddedIdentifier) throws EntityNotFoundException {
     return Optional
       .ofNullable(repository.findByIdentifier(embeddedIdentifier))
-      .orElseThrow(() -> new EntityNotFoundException("Entity with id: ["+ embeddedIdentifier.getUuid().toString() +" ] not found"));
+      .orElseThrow(() -> new EntityNotFoundException("Could not fin entity: ["+ embeddedIdentifier.getUuid().toString() +"]"));
   }
 
   /**
@@ -110,9 +110,9 @@ public class RestfullApiServiceImpl<T extends BaseEntity, ID extends EmbeddedIde
    * @throws EntityNotFoundException Exception thrown where entity not found.
    */
   @Override
-  public T update(ID id, T entity) throws EntityNotFoundException {
+  public T update(EmbeddedIdentifier embeddedIdentifier, T entity) throws EntityNotFoundException {
 
-    T byIdentifier = repository.findByIdentifier(id);
+    T byIdentifier = repository.findByIdentifier(embeddedIdentifier);
 
     patchEntity(byIdentifier, entity);
 

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.sass.erp.finance.cash.api_service.annotations.Fillable;
+import com.sass.erp.finance.cash.api_service.annotations.Guarded;
 import com.sass.erp.finance.cash.api_service.annotations.SensitiveInformation;
 import com.sass.erp.finance.cash.api_service.models.entities.BaseEntity;
 import com.sass.erp.finance.cash.api_service.models.entities.authorizations.relationship.UserHasRolesEntity;
@@ -23,7 +24,7 @@ import org.hibernate.annotations.Fetch;
 @Table(name = "CASH_AUTHORIZATION_USERS")
 public class UserEntity extends BaseEntity {
   @Fillable
-  @Column(name = "username", nullable = false)
+  @Column(name = "username", nullable = false, unique = true)
   @NotBlank(message = "Username is required")
   @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
   private String username;
@@ -32,7 +33,7 @@ public class UserEntity extends BaseEntity {
   @Column(name = "email", nullable = false, unique = true)
   private String email;
 
-  @Fillable
+  @Guarded
   @SensitiveInformation
   @Column(name = "password", nullable = false)
   private String password;
@@ -41,18 +42,23 @@ public class UserEntity extends BaseEntity {
   @Column(name = "is_active")
   private Boolean isActive;
 
+  @Fillable
   @Column(name = "is_locked")
   private Boolean isLocked;
 
+  @Fillable
   @Column(name = "is_verified")
   private Boolean isVerified;
 
+  @Fillable
   @Column(name = "is_external")
   private Boolean isExternal;
 
+  @Fillable
   @Column(name = "is_migrated")
   private Boolean isMigrated;
 
+  @Fillable
   @Column(name = "email_verified_at")
   private LocalDateTime emailVerifiedAt;
 
